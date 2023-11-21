@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
-
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,15 +29,48 @@ func main() {
 		klog.Fatalf("error creating manager: %", err)
 	}
 
-	deploymentList := &appsv1.DeploymentList{}
+	deploymentList := &appsv1.DeploymentList{
+		Items :appsv1.Deployment{
+		Spec: appsv1.DeploymentSpec{
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{Name: "web", Image: "nginx:1.21"},
+					},
+				},
+			},
+		},
+	},
+}
+	
+	deployment := &appsv1.Deployment{
+		Spec: appsv1.DeploymentSpec{
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{Name: "web", Image: "nginx:1.21"},
+					},
+				},
+			},
+		},
+	}
+
 	err = cl.List(ctx, deploymentList)
 	if err != nil {
 		klog.Warningf("error retrieving pod metrics: %s", err)
 		return
 	}
-	for i := deploymentList.Items {
-
-		fmt.Printf("%#v\n\n\n", i)
-
+	for _, item := range deploymentList.Items {
+		fmt.Printf("%#v\n\n\n", item)
 	}
+	err = cl.Get(ctx, client.ObjectKey{
+		Namespace: "default",
+		Name:      "liqo-dashboard-backend",
+		},deployment)
+	if err != nil {
+		klog.Warningf("error retrieving pod metrics: %s", err)
+		return
+	}
+	fmt.Printf("%#v\n\n\n", deployment)
+
 }
