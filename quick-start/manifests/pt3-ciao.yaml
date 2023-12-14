@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-remote3
+  namespace: liqo-demo-ciao
+  labels:
+    app: liqo-demo-ciao
+spec:
+  containers:
+    - name: nginx
+      image: nginxdemos/hello
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+          name: web
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                  - virtual-node
+
