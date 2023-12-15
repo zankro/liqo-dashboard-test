@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	discoveryv1alpha1 "github.com/liqotech/liqo/apis/discovery/v1alpha1"
@@ -10,6 +11,7 @@ import (
 	liqogetters "github.com/liqotech/liqo/pkg/utils/getters"
 	liqolabels "github.com/liqotech/liqo/pkg/utils/labels"
 	liqorestcfg "github.com/liqotech/liqo/pkg/utils/restcfg"
+	virtualkubeletconsts "github.com/liqotech/liqo/pkg/virtualKubelet/forge"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -205,17 +207,26 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		return nil, err
 	}
 
+	podJson, err := json.MarshalIndent(remotePodList, "", "  ")
+	if err != nil {
+		klog.Fatalf("error converting pod to JSON: %s", err)
+		return nil, err
+	}
+	fmt.Println(string(podJson), "Questo è il podJson\n\n\n\n\n\n\n\n")
+
+	//map[podName]nodeName
 	remoteNodeNamePod := make(map[string]string)
 	for _, pod := range remotePodList.Items {
 		remoteNodeNamePod[pod.Name] = pod.Spec.NodeName
 	}
 
+	//map[clusterID]nodeName
 	remoteNodeList := make(map[string]string)
 	localNodeList := []string{}
 
+	//Questa è da ottimizzare perchè non è efficiente dato che devo fare una ricerca per valore nella mappa [podName]nodeName
 	nodeList := &corev1.NodeList{}
 	err = cl.List(ctx, nodeList)
-
 	if err != nil {
 		klog.Errorf("error retrieving nodes: %s", err)
 		return nil, err
@@ -225,14 +236,14 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		for _, nodeName := range remoteNodeNamePod {
 			if node.Name == nodeName {
 				remoteNodeList[node.Labels["liqo.io/remote-cluster-id"]] = node.Name
-				fmt.Println(remoteNodeList, "Questi sono i remoteNodeList\n\n\n\n\n\n\n\n")
 			} else {
+				//Modificare perchè ci sono tanti nodi ripetuti e anche i nodi remoti potrebbero essere presenti
 				localNodeList = append(localNodeList, node.Name)
 			}
 		}
 	}
-	localPodList := &corev1.PodList{}
 
+	localPodList := &corev1.PodList{}
 	err = cl.List(ctx, remotePodList, client.MatchingLabels{
 		liqoconsts.LocalPodLabelKey: "false",
 	})
@@ -241,6 +252,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		return nil, err
 	}
 
+	//map[podName]nodeName
 	localNodeNamePod := make(map[string]string)
 	for _, pod := range localPodList.Items {
 		localNodeNamePod[pod.Name] = pod.Spec.NodeName
@@ -258,9 +270,9 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 	virtualNodeResourceMetrics := make(map[string]NodeResourceMetrics)
 	localNodeResourceMetrics := make(map[string]NodeResourceMetrics)
 
-	for _, pod := range podMetricsList.Items {
+	for i, pod := range podMetricsList.Items {
 		var podCpuUsage, podMemoryUsage float64
-		var containerResources []ContainerResourceMetrics
+		containerResources := []ContainerResourceMetrics{}
 		for _, cont := range pod.Containers {
 			cpuUsage := cont.Usage.Cpu().AsApproximateFloat64()
 			memoryUsage := cont.Usage.Memory().AsApproximateFloat64()
@@ -272,20 +284,24 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 				TotalMemory: memoryUsage,
 			})
 		}
-		if remoteNodeNamePod[pod.Name] != "" {
+		if remoteNodeNamePod[pod.Name] != "" && pod.Labels["virtualkubelet.liqo.io/origin"] == "" {
 			var remoteNode NodeResourceMetrics
-			if _, exists := virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; !exists {
-				remoteNode = NodeResourceMetrics{}
-			} else {
+			if _, exists := virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
 				remoteNode = virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
+			} else {
+				remoteNode = NodeResourceMetrics{}
+				remoteNode.Name = remoteNodeNamePod[pod.Name]
+				remoteNode.TotalCpus = 0
+				remoteNode.TotalMemory = 0
 			}
-			remoteNode.Name = remoteNodeNamePod[pod.Name]
 			remoteNode.TotalCpus += podCpuUsage
 			remoteNode.TotalMemory += podMemoryUsage
+			fmt.Println("pod numero", i, pod.Name, "Questo è il pod name")
+
 			if remoteNode.Pods == nil {
 				remoteNode.Pods = &[]PodResourceMetrics{}
-				fmt.Println(pod.Name, "Questo è il pod name\n\n\n\n\n\n\n\n")
 			}
+			//credo la * si possa cancellare (anche dal models)
 			*remoteNode.Pods = append(*remoteNode.Pods, PodResourceMetrics{
 				Name:                pod.Name,
 				ContainersResources: &containerResources,
@@ -297,12 +313,14 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		}
 		if localNodeNamePod[pod.Name] != "" {
 			var localNode NodeResourceMetrics
-			if _, exists := virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; !exists {
-				localNode = NodeResourceMetrics{}
+			if _, exists := localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
+				localNode = localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
 			} else {
-				localNode = virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
+				localNode = NodeResourceMetrics{}
+				localNode.Name = remoteNodeNamePod[pod.Name]
+				localNode.TotalCpus = 0
+				localNode.TotalMemory = 0
 			}
-			localNode.Name = remoteNodeNamePod[pod.Name]
 			localNode.TotalCpus += podCpuUsage
 			localNode.TotalMemory += podMemoryUsage
 			if localNode.Pods == nil {
@@ -329,8 +347,83 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 			clusterDto.TotalCpus = outgoingResources.TotalCpus
 			clusterDto.TotalMemory = outgoingResources.TotalMemory
 		}
-
 		ClusterDto = append(ClusterDto, *clusterDto)
 	}
+
+	incomingClusterResources := make(map[string][]PodResourceMetrics)
+
+	incomingPodResources := make(map[string]PodResourceMetrics)
+
+	incomingPodMetricsList := []metricsv1beta1.PodMetricsList{}
+
+	for _, actualCluster := range ClusterDto {
+		podMetricsList := &metricsv1beta1.PodMetricsList{}
+		clusterID := actualCluster.clusterID
+		fmt.Println(clusterID, "Questo è il clusterID\n")
+		if err := cl.List(ctx, podMetricsList, client.MatchingLabels{
+			virtualkubeletconsts.LiqoOriginClusterIDKey: clusterID,
+		}); err != nil {
+			return nil, err
+		}
+		incomingPodMetricsList = append(incomingPodMetricsList, *podMetricsList)
+	}
+
+	for _, pod := range incomingPodMetricsList {
+		for _, podMetrics := range pod.Items {
+			var podCpuUsage, podMemoryUsage float64
+			containerResources := []ContainerResourceMetrics{}
+			for _, cont := range podMetrics.Containers {
+				cpuUsage := cont.Usage.Cpu().AsApproximateFloat64()
+				memoryUsage := cont.Usage.Memory().AsApproximateFloat64()
+				podCpuUsage += cpuUsage
+				podMemoryUsage += memoryUsage
+				containerResources = append(containerResources, ContainerResourceMetrics{
+					Name:        cont.Name,
+					TotalCpus:   cpuUsage,
+					TotalMemory: memoryUsage,
+				})
+			}
+			var incomingPod PodResourceMetrics
+			if _, exists := incomingPodResources[incomingPod.Name]; exists {
+				fmt.Println(podMetrics.Name, "Questo è il pod name\n\n\n\n\n\n\n\n")
+				incomingPod = incomingPodResources[podMetrics.Name]
+			} else {
+				incomingPod = PodResourceMetrics{}
+				incomingPod.Name = podMetrics.Name
+				incomingPod.TotalCpus = 0
+				incomingPod.TotalMemory = 0
+			}
+			incomingPod.TotalCpus += podCpuUsage
+			incomingPod.TotalMemory += podMemoryUsage
+			if incomingPod.ContainersResources == nil {
+				incomingPod.ContainersResources = &[]ContainerResourceMetrics{}
+			}
+			*incomingPod.ContainersResources = append(*incomingPod.ContainersResources, ContainerResourceMetrics{
+				Name:        podMetrics.Name,
+				TotalMemory: podMemoryUsage,
+				TotalCpus:   podCpuUsage,
+			})
+			incomingPodResources[incomingPod.Name] = incomingPod
+			if incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] == nil {
+				incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] = []PodResourceMetrics{}
+			}
+			incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] = append(incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]], incomingPod)
+		}
+	}
+	for clusterID, incomingClusterResources := range incomingClusterResources {
+		for _, cluster := range ClusterDto {
+			if cluster.clusterID == clusterID {
+				cluster.IncomingResources = &incomingClusterResources
+			}
+		}
+	}
+
+	for i, _ := range ClusterDto {
+		ClusterDto[i].IncomingResources = &[]PodResourceMetrics{}
+		for _, pod := range incomingClusterResources[ClusterDto[i].clusterID] {
+			*ClusterDto[i].IncomingResources = append(*ClusterDto[i].IncomingResources, pod)
+		}
+	}
+
 	return ClusterDto, nil
 }

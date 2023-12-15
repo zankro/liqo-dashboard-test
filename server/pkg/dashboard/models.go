@@ -15,7 +15,7 @@ type ClusterDto struct {
 	OutgoingPeering   discoveryv1alpha1.PeeringConditionStatusType `json:"outgoingPeering"`
 	OutgoingResources *NodeResourceMetrics                         `json:"outgoingResources"`
 	IncomingPeering   discoveryv1alpha1.PeeringConditionStatusType `json:"incomingPeering"`
-	IncomingResources *NodeResourceMetrics                         `json:"incomingResources"`
+	IncomingResources *[]PodResourceMetrics                        `json:"incomingResources"`
 	TotalMemory       float64                                      `json:"totalMemory"`
 	TotalCpus         float64                                      `json:"totalCpus"`
 	Age               string                                       `json:"age,omitempty"`
