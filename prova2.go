@@ -25,6 +25,7 @@ func init() {
 	_ = discoveryv1alpha1.AddToScheme(scheme)
 	_ = sharingv1alpha1.AddToScheme(scheme)
 	_ = corev1.AddToScheme(scheme)
+	_ = net.AddToScheme(scheme)
 }
 
 func main() {

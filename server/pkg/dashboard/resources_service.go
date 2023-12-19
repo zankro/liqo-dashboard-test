@@ -2,8 +2,10 @@ package dashboard
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+
+	//net "github.com/liqotech/liqo/apis/net/v1alpha1"
+	net "github.com/liqotech/liqo/apis/net/v1alpha1"
 
 	discoveryv1alpha1 "github.com/liqotech/liqo/apis/discovery/v1alpha1"
 	sharingv1alpha1 "github.com/liqotech/liqo/apis/sharing/v1alpha1"
@@ -30,6 +32,7 @@ func init() {
 	_ = sharingv1alpha1.AddToScheme(scheme)
 	_ = metricsv1beta1.AddToScheme(scheme)
 	_ = corev1.AddToScheme(scheme)
+	_ = net.AddToScheme(scheme)
 }
 
 // GetKClient creates a kubernetes API client and returns it.
@@ -96,7 +99,7 @@ func GetKClient(ctx context.Context) (client.Client, error) {
 // clusterID identifies the virtual node by the label liqo.io/remote-cluster-id=clusterID.
 func calculateOutgoingResources(ctx context.Context, cl client.Client, clusterID string,
 	shadowPodsMetrics map[string]*metricsv1beta1.PodMetrics) (*ContainerResourceMetrics, error) {
-	resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.RemoteLabelSelector(clusterID))
+	resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.RemoteLabelSelector())
 	if err != nil {
 		klog.V(5).Infof("error retrieving resourceOffers: %s", err)
 		return nil, err
@@ -207,23 +210,19 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		return nil, err
 	}
 
-	podJson, err := json.MarshalIndent(remotePodList, "", "  ")
-	if err != nil {
-		klog.Fatalf("error converting pod to JSON: %s", err)
-		return nil, err
-	}
-	fmt.Println(string(podJson), "Questo è il podJson\n\n\n\n\n\n\n\n")
-
 	//map[podName]nodeName
 	remoteNodeNamePod := make(map[string]string)
+	namespaceMap := make(map[string]bool)
 	for _, pod := range remotePodList.Items {
 		remoteNodeNamePod[pod.Name] = pod.Spec.NodeName
+		if _, exists := namespaceMap[pod.Namespace]; !exists {
+			namespaceMap[pod.Namespace] = true
+		}
 	}
 
 	//map[clusterID]nodeName
 	remoteNodeList := make(map[string]string)
 	localNodeList := []string{}
-
 	//Questa è da ottimizzare perchè non è efficiente dato che devo fare una ricerca per valore nella mappa [podName]nodeName
 	nodeList := &corev1.NodeList{}
 	err = cl.List(ctx, nodeList)
@@ -244,9 +243,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 	}
 
 	localPodList := &corev1.PodList{}
-	err = cl.List(ctx, remotePodList, client.MatchingLabels{
-		liqoconsts.LocalPodLabelKey: "false",
-	})
+	err = cl.List(ctx, localPodList)
 	if err != nil {
 		klog.Errorf("error retrieving local pods: %s", err)
 		return nil, err
@@ -258,8 +255,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		localNodeNamePod[pod.Name] = pod.Spec.NodeName
 	}
 
-	fmt.Println(localNodeNamePod, "Questi sono i local NodeNamePod\n\n\n\n\n\n\n\n")
-
 	podMetricsList := &metricsv1beta1.PodMetricsList{}
 	err = cl.List(ctx, podMetricsList)
 	if err != nil {
@@ -270,7 +265,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 	virtualNodeResourceMetrics := make(map[string]NodeResourceMetrics)
 	localNodeResourceMetrics := make(map[string]NodeResourceMetrics)
 
-	for i, pod := range podMetricsList.Items {
+	for _, pod := range podMetricsList.Items {
 		var podCpuUsage, podMemoryUsage float64
 		containerResources := []ContainerResourceMetrics{}
 		for _, cont := range pod.Containers {
@@ -284,7 +279,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 				TotalMemory: memoryUsage,
 			})
 		}
-		if remoteNodeNamePod[pod.Name] != "" && pod.Labels["virtualkubelet.liqo.io/origin"] == "" {
+
+		if remoteNodeNamePod[pod.Name] != "" && pod.ObjectMeta.Labels["liqo.io/shadowPod"] != "" {
 			var remoteNode NodeResourceMetrics
 			if _, exists := virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
 				remoteNode = virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
@@ -296,7 +292,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 			}
 			remoteNode.TotalCpus += podCpuUsage
 			remoteNode.TotalMemory += podMemoryUsage
-			fmt.Println("pod numero", i, pod.Name, "Questo è il pod name")
 
 			if remoteNode.Pods == nil {
 				remoteNode.Pods = &[]PodResourceMetrics{}
@@ -310,14 +305,13 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 			})
 
 			virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]] = remoteNode
-		}
-		if localNodeNamePod[pod.Name] != "" {
+		} else if localNodeNamePod[pod.Name] != "" && namespaceMap[pod.Namespace] {
 			var localNode NodeResourceMetrics
 			if _, exists := localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
 				localNode = localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
 			} else {
 				localNode = NodeResourceMetrics{}
-				localNode.Name = remoteNodeNamePod[pod.Name]
+				localNode.Name = localNodeNamePod[pod.Name]
 				localNode.TotalCpus = 0
 				localNode.TotalMemory = 0
 			}
@@ -336,18 +330,20 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 		}
 	}
 
-	var ClusterDto []ClusterDto
+	var ClusterDtoArray []ClusterDto
 
 	for i := range foreignClusterList.Items {
 		clusterDto := fromForeignCluster(&foreignClusterList.Items[i])
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
 			klog.V(5).Infof("Calculating outgoing resources for cluster %s", clusterDto.clusterID)
 			outgoingResources := virtualNodeResourceMetrics[remoteNodeList[clusterDto.clusterID]]
-			clusterDto.OutgoingResources = &outgoingResources
-			clusterDto.TotalCpus = outgoingResources.TotalCpus
-			clusterDto.TotalMemory = outgoingResources.TotalMemory
+			clusterDto.OutgoingResources = nil
+			clusterDto.IncomingResources = nil
+			clusterDto.TotalUsedCpusRecived = outgoingResources.TotalCpus
+			clusterDto.TotalUsedMemoryRecived = outgoingResources.TotalMemory
+			clusterDto.LocalResources = nil
 		}
-		ClusterDto = append(ClusterDto, *clusterDto)
+		ClusterDtoArray = append(ClusterDtoArray, *clusterDto)
 	}
 
 	incomingClusterResources := make(map[string][]PodResourceMetrics)
@@ -356,10 +352,9 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 
 	incomingPodMetricsList := []metricsv1beta1.PodMetricsList{}
 
-	for _, actualCluster := range ClusterDto {
+	for _, actualCluster := range ClusterDtoArray {
 		podMetricsList := &metricsv1beta1.PodMetricsList{}
 		clusterID := actualCluster.clusterID
-		fmt.Println(clusterID, "Questo è il clusterID\n")
 		if err := cl.List(ctx, podMetricsList, client.MatchingLabels{
 			virtualkubeletconsts.LiqoOriginClusterIDKey: clusterID,
 		}); err != nil {
@@ -385,7 +380,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 			}
 			var incomingPod PodResourceMetrics
 			if _, exists := incomingPodResources[incomingPod.Name]; exists {
-				fmt.Println(podMetrics.Name, "Questo è il pod name\n\n\n\n\n\n\n\n")
 				incomingPod = incomingPodResources[podMetrics.Name]
 			} else {
 				incomingPod = PodResourceMetrics{}
@@ -410,20 +404,53 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 			incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] = append(incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]], incomingPod)
 		}
 	}
-	for clusterID, incomingClusterResources := range incomingClusterResources {
-		for _, cluster := range ClusterDto {
-			if cluster.clusterID == clusterID {
-				cluster.IncomingResources = &incomingClusterResources
+
+	for i := range ClusterDtoArray {
+		ClusterDtoArray[i].IncomingResources = &[]PodResourceMetrics{}
+		*ClusterDtoArray[i].IncomingResources = append(*ClusterDtoArray[i].IncomingResources, incomingClusterResources[ClusterDtoArray[i].clusterID]...)
+		for _, pod := range incomingClusterResources[ClusterDtoArray[i].clusterID] {
+			ClusterDtoArray[i].TotalUsedCpusOffered += pod.TotalCpus
+			ClusterDtoArray[i].TotalUsedMemoryOffered += pod.TotalMemory
+		}
+	}
+
+	latency := &net.TunnelEndpointList{}
+
+	if err := cl.List(ctx, latency); err != nil {
+		return nil, err
+	}
+	for i := range ClusterDtoArray {
+		for _, tunnel := range latency.Items {
+			if ClusterDtoArray[i].clusterID == tunnel.Labels["clusterID"] {
+				ClusterDtoArray[i].Latency.Value = tunnel.Status.Connection.Latency.Value
+				ClusterDtoArray[i].Latency.Timestamp = tunnel.Status.Connection.Latency.Timestamp
 			}
 		}
 	}
 
-	for i, _ := range ClusterDto {
-		ClusterDto[i].IncomingResources = &[]PodResourceMetrics{}
-		for _, pod := range incomingClusterResources[ClusterDto[i].clusterID] {
-			*ClusterDto[i].IncomingResources = append(*ClusterDto[i].IncomingResources, pod)
+	for i := range ClusterDtoArray {
+		clusterNode := &corev1.NodeList{}
+		if err := cl.List(ctx, clusterNode, client.MatchingLabels{
+			"liqo.io/remote-cluster-id": ClusterDtoArray[i].clusterID,
+		}); err != nil {
+			return nil, err
 		}
+		if len(clusterNode.Items) != 1 {
+			return nil, fmt.Errorf("expected exactly one element in the list of Nodes but got %d", len(clusterNode.Items))
+		}
+		ClusterDtoArray[i].TotalCpusRecived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
+		ClusterDtoArray[i].TotalMemoryRecived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
 	}
 
-	return ClusterDto, nil
+	var localCluster ClusterDto
+	localCluster.Name = "Local Cluster"
+	localCluster.clusterID = "local"
+	localNodeResources := []NodeResourceMetrics{}
+	for i := range localNodeResourceMetrics {
+		localNodeResources = append(localNodeResources, localNodeResourceMetrics[i])
+	}
+	localCluster.LocalResources = &localNodeResources
+	ClusterDtoArray = append(ClusterDtoArray, localCluster)
+
+	return ClusterDtoArray, nil
 }
