@@ -1,11 +1,20 @@
-import { Container, Navbar } from 'react-bootstrap';
+import { Container, Navbar, Button, ButtonGroup } from 'react-bootstrap';
 import Logo from '../../images/logo.svg';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useMediaQuery } from 'react-responsive';
 import ReactGA from 'react-ga';
+import './Offloading.css';
+import { useState } from "react";
 
 import { ForeignCluster } from '../../api/types';
+import {
+    calculatePercentage,
+    getHighestUnit,
+    noResourcesMessage,
+    textOnChart,
+    bytesToGB,
+  } from '../../utils/utils';
 
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
@@ -23,6 +32,7 @@ export interface IClusterList {
 function Offloading(props: IClusterList) {
     const { clusters, refs } = props;
     console.log(clusters);
+    const [showRam, setShowRam] = useState(true);
 
     // const local: string = clusters[0].name;
 
@@ -55,78 +65,66 @@ function Offloading(props: IClusterList) {
         console.log(clusters.find(c => c.name == 'Local Cluster'))
         const y = clusters[0].localResources[0].NodetotalCpus;
         const y2 = clusters[0].localResources[0].NodetotalMemory;
+
+
         return(
-            // <Plot
-            //   data={[
-            //     {
-            //     //   labels: labels,
-            //     //   parents: ["", labels[1], labels[1]],
-            //     // labels: ["Eve", clusters[0].name, "Seth", "Enos", "Noam", "Abel", "Awan", "Enoch", "Azura"],
-            //     // parents: ["", "Seth", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve" ],
-
-            //     labels: [clusters[0].name, clusters[1].name, clusters[2].name],
-            //     parents: ["", clusters[0].name, clusters[1].name],
-            //       type: 'treemap',
-            //     //   mode: 'lines+markers',
-            //     //   marker: {color: 'red'},
-            //     }
-            //   ]}
-            //   layout={ {width: 800, height: 800, title: 'A Fancy Plot'} }
-            // />
-
             <>
-            {clusters.map((cluster, i) => (
-                cluster.outgoingPeering === 'Established' ? (
-                <>
-                <Plot
-                    key={i}
-                    data={[
-                    {
-                        x: ['Memory'],
-                        y: [cluster.TotalUsedMemoryRecived],
-                        type: "bar"
-                    },
-                    {
-                        x: ['Memory'],
-                        y: [cluster.TotalMemoryRecived],
-                        type: "bar"
-                    }
-                    ]}
-                    layout={ {width: 500, height: 500, title: cluster.name, barmode: "stack", yaxis: {range: [0,8000000]} } }
-                />
+                <div className='center'>
+                    <Button variant="primary" onClick={() => {setShowRam(!showRam)}}>
+                        Mostra {showRam ? "CPU" : "RAM"} 
+                    </Button>
+                </div>
 
-                <Plot
-                key={i}
-                data={[
-                {
-                    x: ['CPU'],
-                    y: [cluster.TotalUsedCpusRecived],
-                    type: "bar"
-                },
-                {
-                    x: ['CPU'],
-                    y: [cluster.TotalCpusRecived],
-                    type: "bar"
-                }
-                ]}
-                layout={ {width: 500, height: 500, title: cluster.name, barmode: "stack", yaxis: {range: [0,cluster.TotalCpusRecived]} } }
-                />
-                </>
+                {clusters.map((cluster, i) => (
+
+                    cluster.outgoingPeering === 'Established' ? (
+                    <>
+                        {console.log(cluster.Latency)}
+                        {showRam ? 
+                            <Plot
+                                key={i}
+                                data={[
+                                {
+                                    x: ['Memory (GB)'],
+                                    y: [bytesToGB(cluster.TotalUsedMemoryRecived)],
+                                    type: "bar"
+                                },
+                                {
+                                    x: ['Memory (GB)'],
+                                    y: [bytesToGB(cluster.TotalMemoryRecived)],
+                                    type: "bar"
+                                }
+                                ]}
+                                layout={ {width: 500, height: 500, title: cluster.name + ' (Latency: ' + cluster.Latency.value + ')', barmode: "stack", yaxis: {range: [0,bytesToGB(cluster.TotalMemoryRecived)]} } }
+                                // config={{staticPlot: true}}
+                            /> :
+
+                            <Plot
+                            key={i}
+                            data={[
+                            {
+                                x: ['CPU'],
+                                y: [cluster.TotalUsedCpusRecived],
+                                type: "bar"
+                            },
+                            {
+                                x: ['CPU'],
+                                y: [cluster.TotalCpusRecived],
+                                type: "bar"
+                            }
+                            ]}
+                            layout={ {width: 500, height: 500, title: cluster.name + ' (Latency: ' + cluster.Latency.value + ')', barmode: "stack", yaxis: {range: [0,cluster.TotalCpusRecived]} } }
+                            />
+                        }
+                    </>
                 ) : <></>
-            ))}
+                ))}
             </>
 
             
           );
     } 
-
-    return(
-        <div>
-            
-        </div>
-    )
-
-  }
+}
   
 
 export default Offloading;

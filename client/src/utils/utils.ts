@@ -41,7 +41,9 @@ export function getHighestUnit(bytes: number): string {
     bytes /= 1024;
     unitIndex++;
   }
-  return `${bytes?.toFixed(1)} ${units[unitIndex]}`;
+  console.log(`${bytes?.toFixed(1)} ${units[unitIndex]}`)
+  // return `${bytes?.toFixed(1)} ${units[unitIndex]}`;
+  return `${bytes?.toFixed(1)}`;
 }
 
 export function textOnChart(
@@ -73,4 +75,9 @@ function getIsoFormattedDate(s: string): string {
   const dateWithoutTimezone: string = s.slice(0, -4);
   const lastSpaceIndex: number = dateWithoutTimezone.lastIndexOf(' ');
   return removeCharAt(lastSpaceIndex, dateWithoutTimezone);
+}
+
+export function bytesToGB(bytes: number): number {
+  console.log(bytes / Math.pow(10, 9));
+  return bytes / Math.pow(10, 9);
 }
