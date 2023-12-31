@@ -1,130 +1,140 @@
-import { Container, Navbar, Button, ButtonGroup } from 'react-bootstrap';
-import Logo from '../../images/logo.svg';
-import { GiHamburgerMenu } from 'react-icons/gi';
-import { AiOutlineClose } from 'react-icons/ai';
-import { useMediaQuery } from 'react-responsive';
-import ReactGA from 'react-ga';
-import './Offloading.css';
-import { useState } from "react";
-
-import { ForeignCluster } from '../../api/types';
-import {
-    calculatePercentage,
-    getHighestUnit,
-    noResourcesMessage,
-    textOnChart,
-    bytesToGB,
-  } from '../../utils/utils';
-
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
-
+import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
+import { ForeignCluster } from '../../api/types';
+import { bytesToGB } from '../../utils/utils';
+import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
+import Draggable from 'react-draggable';
+import { Button } from 'react-bootstrap';
+
+interface FrecceContainerProps {
+  localCluster: ForeignCluster;
+  showRam: boolean;
+  remoteClusters: ForeignCluster[];
+}
+const boxStyle = {
+  border: 'grey solid 2px',
+  borderRadius: '10px',
+  padding: '5px',
+};
+
+const FrecceContainer: React.FC<FrecceContainerProps> = ({
+  localCluster,
+  showRam,
+  remoteClusters,
+}) => {
+  return (
+    <div>
+      <Xwrapper>
+        <DraggableBox cluster={localCluster} showRam={showRam} id="elem1" />
+        {remoteClusters.map((cluster, i) => (
+          <>
+            <DraggableBox
+              cluster={cluster}
+              showRam={showRam}
+              id={`elem${i}`}
+              key={i}
+            />
+            <Xarrow start={'elem1'} end={`elem${i}`} />
+          </>
+        ))}
+      </Xwrapper>
+    </div>
+  );
+};
+
+interface DraggableBoxProps {
+  id: string;
+  cluster: ForeignCluster;
+  showRam: boolean;
+}
+
+const DraggableBox: React.FC<DraggableBoxProps> = ({
+  id,
+  cluster,
+  showRam,
+}) => {
+  const updateXarrow = useXarrow();
+  return (
+    <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
+      <div id={id}>
+        <ClusterChart cluster={cluster} showRam={showRam} id={id} />
+      </div>
+    </Draggable>
+  );
+};
 
 export interface IClusterList {
-    clusters: ForeignCluster[];
-    refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
+  clusters: { [key: string]: ForeignCluster[] };
+  refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 }
-
-
-
 
 function Offloading(props: IClusterList) {
-    const { clusters, refs } = props;
-    console.log(clusters);
-    const [showRam, setShowRam] = useState(true);
-
-    // const local: string = clusters[0].name;
-
-    // console.log(clusters[0].name);
-    // console.log(local);
-
-
-    // return (
-    //     <>
-    //         <div>
-    //             {
-    //                 clusters.map(c => {
-    //                     console.log(c.name)
-    //                     return (
-    //                         <h1 key={c.name}>
-    //                             {c.name}
-    //                         </h1>
-    //                     )
-    //                 })
-    //             }
-    //         </div>
-    //     </>
-    // );
-
-    
-    if(clusters[0] != null) {
-        console.log(clusters[0].name)
-        const labels = clusters.map(c => c.name)
-        console.log(labels)
-        console.log(clusters.find(c => c.name == 'Local Cluster'))
-        const y = clusters[0].localResources[0].NodetotalCpus;
-        const y2 = clusters[0].localResources[0].NodetotalMemory;
-
-
-        return(
-            <>
-                <div className='center'>
-                    <Button variant="primary" onClick={() => {setShowRam(!showRam)}}>
-                        Mostra {showRam ? "CPU" : "RAM"} 
-                    </Button>
-                </div>
-
-                {clusters.map((cluster, i) => (
-
-                    cluster.outgoingPeering === 'Established' ? (
-                    <>
-                        {console.log(cluster.Latency)}
-                        {showRam ? 
-                            <Plot
-                                key={i}
-                                data={[
-                                {
-                                    x: ['Memory (GB)'],
-                                    y: [bytesToGB(cluster.TotalUsedMemoryRecived)],
-                                    type: "bar"
-                                },
-                                {
-                                    x: ['Memory (GB)'],
-                                    y: [bytesToGB(cluster.TotalMemoryRecived)],
-                                    type: "bar"
-                                }
-                                ]}
-                                layout={ {width: 500, height: 500, title: cluster.name + ' (Latency: ' + cluster.Latency.value + ')', barmode: "stack", yaxis: {range: [0,bytesToGB(cluster.TotalMemoryRecived)]} } }
-                                // config={{staticPlot: true}}
-                            /> :
-
-                            <Plot
-                            key={i}
-                            data={[
-                            {
-                                x: ['CPU'],
-                                y: [cluster.TotalUsedCpusRecived],
-                                type: "bar"
-                            },
-                            {
-                                x: ['CPU'],
-                                y: [cluster.TotalCpusRecived],
-                                type: "bar"
-                            }
-                            ]}
-                            layout={ {width: 500, height: 500, title: cluster.name + ' (Latency: ' + cluster.Latency.value + ')', barmode: "stack", yaxis: {range: [0,cluster.TotalCpusRecived]} } }
-                            />
-                        }
-                    </>
-                ) : <></>
-                ))}
-            </>
-
-            
-          );
-    } 
+  const { clusters } = props;
+  const [showRam, setShowRam] = useState(true);
+  const localCluster = clusters.local[0];
+  if (clusters.local.length > 0) {
+    return (
+      <>
+      <Button onClick={() => setShowRam((oldshowRam)=>!oldshowRam)}>{showRam?"RAM":"CPU"}</Button>
+      <FrecceContainer
+        localCluster={localCluster}
+        showRam={showRam}
+        remoteClusters={clusters.remote}
+      />
+      </>
+    );
+  } else {
+    return <div> Loading... </div>;
+  }
 }
-  
+
+interface ClusterChartProps {
+  cluster: ForeignCluster;
+  showRam: boolean;
+  id: string;
+}
+
+function ClusterChart({ cluster, showRam, id }: ClusterChartProps) {
+  return (
+    <>
+      <Plot
+        key={cluster.name}
+        data={[
+          {
+            x: [showRam ? 'Memory (GB)' : 'CPU'],
+            y: [
+              showRam
+                ? bytesToGB(cluster.TotalUsedMemoryRecived)
+                : cluster.TotalUsedCpusRecived,
+            ],
+            type: 'bar',
+            name: 'Used',
+          },
+          {
+            x: [showRam ? 'Memory (GB)' : 'CPU'],
+            y: [
+              showRam
+                ? bytesToGB(cluster.TotalMemoryRecived)
+                : cluster.TotalCpusRecived,
+            ],
+            type: 'bar',
+            name: 'Total',
+          },
+        ]}
+        layout={{
+          width: 500,
+          height: 500,
+          barmode: 'stack',
+          yaxis: {
+            type: 'log',
+            autorange: true,
+            showticklabels: false,
+            showgrid: false,
+          },
+        }}
+      />
+    </>
+  );
+}
 
 export default Offloading;

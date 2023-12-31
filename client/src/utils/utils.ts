@@ -41,7 +41,7 @@ export function getHighestUnit(bytes: number): string {
     bytes /= 1024;
     unitIndex++;
   }
-  console.log(`${bytes?.toFixed(1)} ${units[unitIndex]}`)
+  console.log(`${bytes?.toFixed(1)} ${units[unitIndex]}`);
   // return `${bytes?.toFixed(1)} ${units[unitIndex]}`;
   return `${bytes?.toFixed(1)}`;
 }

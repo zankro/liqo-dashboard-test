@@ -1,14 +1,12 @@
 import { ForeignCluster } from './types';
 
-function getPeerings(): Promise<Array<ForeignCluster>> {
-
-  console.log('prova API')
-
-  return get<Array<ForeignCluster>>(
-      'http://localhost:8089/api/foreign_clusters'
+function getPeerings(): Promise<{ [key: string]: ForeignCluster[] }> {
+  return get<{ [key: string]: ForeignCluster[] }>(
+      'http://localhost:8092/api/foreign_clusters'
   )
-
-    .then((clusters: Array<ForeignCluster>) => clusters)
+    .then((clusters: { [key: string]: ForeignCluster[] }) => {
+      return clusters;
+    })
     .catch(err => {
       console.error('Error fetching the clusters');
       throw Error(`Error fetching the clusters: ${err}`);

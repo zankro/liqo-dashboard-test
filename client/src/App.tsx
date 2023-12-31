@@ -10,19 +10,18 @@ import ClusterList from './components/clusterComponent/ClusterList';
 import LiqoNavTabs from './components/LiqoNavTabs/LiqoNavTabs'
 
 function App() {
-  const [clusters, setClusters] = useState<Array<ForeignCluster>>([]);
+  const [clusters, setClusters] = useState<{ [key: string]: ForeignCluster[] }>({});
   const [currentCluster, setCurrentCluster] = useState<ForeignCluster>();
   const [init, setInit] = useState<Boolean>(true);
   const [isHamburgerOpened, setHamburgerStatus] = useState<Boolean>(false);
   const refs = useRef<Array<HTMLDivElement | null>>([]);
 
   const fetchAndSetCluster = useCallback(() => {
-    API.getPeerings().then(clusters => {
-      clusters.sort((a, b) => a.name.localeCompare(b.name));
-      setClusters(clusters);
-      if (clusters.length > 0) {
+    API.getPeerings().then(fetchedClusters => {
+      setClusters(fetchedClusters);
+      if (Object.keys(fetchedClusters).length > 0) {
         if (!currentCluster) {
-          setCurrentCluster(clusters[0]);
+          setCurrentCluster(fetchedClusters.local[0]);
         }
       }
     });
@@ -42,8 +41,8 @@ function App() {
   }, [fetchAndSetCluster, init]);
 
   useEffect(() => {
-    refs.current = refs.current.slice(0, clusters.length);
-  }, [clusters.length]);
+    refs.current = refs.current.slice(0, Object.keys(clusters).length);
+  }, [Object.keys(clusters).length]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -51,16 +50,16 @@ function App() {
         const top: number = ref?.getBoundingClientRect().top || 0;
         return top < 300 && top > -300;
       });
-      if (index !== -1 && clusters[index] !== currentCluster) {
-        setCurrentCluster(clusters[index]);
+      if (index !== -1 && clusters[Object.keys(clusters)[index]][0] !== currentCluster) {
+        setCurrentCluster(clusters[Object.keys(clusters)[index]][0]);
       }
     };
     window.addEventListener('scroll', onScroll);
   }, [currentCluster, clusters]);
 
   function onClusterClick(clusterName: string) {
-    const clusterIndex = clusters.findIndex(
-      (cluster: ForeignCluster) => cluster.name === clusterName
+    const clusterIndex = Object.keys(clusters).findIndex(
+      (name: string) => name === clusterName
     );
     if (clusterIndex !== -1) {
       refs.current[clusterIndex]?.scrollIntoView({
@@ -70,7 +69,7 @@ function App() {
   }
 
   return (
-    clusters ? 
+    Object.keys(clusters).length > 0 ? 
     <>
       <LiqoNavbar
         onHamburgerClick={() =>
@@ -84,15 +83,13 @@ function App() {
             <Sidebar
               onClusterClick={onClusterClick}
               currentClusterName={currentCluster?.name}
-              clustersNames={clusters.map(
-                (cluster: ForeignCluster) => cluster.name
-              )}
+              clustersNames={Object.keys(clusters)}
               collapsed={!isHamburgerOpened}
             />
           </Col>
           <Col md={10} className="pb-4 myTabs">
             <LiqoNavTabs clusters={clusters} refs={refs} />
-            {/* <ClusterList clusters={clusters} refs={refs} /> */}
+            {/* <ClusterList clusters={Object.values(clusters).flat()} refs={refs} /> */}
           </Col>
         </Row>
       </Container>

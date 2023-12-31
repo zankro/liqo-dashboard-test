@@ -4,10 +4,8 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useMediaQuery } from 'react-responsive';
 import ReactGA from 'react-ga';
-
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-
 
 const win = window as any;
 
@@ -31,16 +29,16 @@ function LiqoNavbar(props: ILiqoNavbar) {
         <Navbar bg="dark" variant="dark" fixed="top">
           <Container fluid={true}>
             {!isSingleColumn ? (
-                <Navbar.Brand>
-                  <img
-                    alt=""
-                    src={Logo}
-                    width="110"
-                    height="30"
-                    className="d-inline-block align-top"
-                  />{' '}
-                  Public peering dashboard
-                </Navbar.Brand>
+              <Navbar.Brand>
+                <img
+                  alt=""
+                  src={Logo}
+                  width="110"
+                  height="30"
+                  className="d-inline-block align-top"
+                />{' '}
+                Public peering dashboard
+              </Navbar.Brand>
             ) : (
               <Navbar.Brand
                 onClick={(event: any) => {
@@ -50,41 +48,12 @@ function LiqoNavbar(props: ILiqoNavbar) {
               >
                 {!isHamburgerOpened ? <GiHamburgerMenu /> : <AiOutlineClose />}
               </Navbar.Brand>
-            
             )}
           </Container>
         </Navbar>
       </div>
-
-      {/* <div className="center">
-        <LiqoNavTabs />
-      </div> */}
-
     </div>
-
   );
 }
-
-
-
-// function LiqoNavTabs() {
-//   return (
-//     <Tabs
-//       defaultActiveKey="profile"
-//       id="uncontrolled-tab-example"
-//       className="mb-3"
-//     >
-//       <Tab eventKey="home" title="Home">
-//         Tab content for Home
-//       </Tab>
-//       <Tab eventKey="profile" title="Profile">
-//         Tab content for Profile
-//       </Tab>
-//       <Tab eventKey="contact" title="Contact" disabled>
-//         Tab content for Contact
-//       </Tab>
-//     </Tabs>
-//   );
-// }
 
 export default LiqoNavbar;

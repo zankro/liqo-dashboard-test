@@ -191,7 +191,7 @@ func getOutgoingPods(ctx context.Context, cl client.Client, clusterID string) ([
 	return podList.Items, nil
 }
 
-func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, error) {
+func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]ClusterDto, error) {
 
 	foreignClusterList := &discoveryv1alpha1.ForeignClusterList{}
 	err := cl.List(ctx, foreignClusterList)
@@ -445,12 +445,33 @@ func getDetailedResources(ctx context.Context, cl client.Client) ([]ClusterDto, 
 	var localCluster ClusterDto
 	localCluster.Name = "Local Cluster"
 	localCluster.clusterID = "local"
+
+	for _, clusterDto := range ClusterDtoArray {
+		fmt.Println(clusterDto.OutgoingPeering, " outgoing peering\n")
+		if isPeeringEstablished(clusterDto.OutgoingPeering) {
+			localCluster.TotalUsedCpusRecived += clusterDto.TotalUsedCpusRecived
+			localCluster.TotalUsedMemoryRecived += clusterDto.TotalUsedMemoryRecived
+			localCluster.TotalCpusRecived += clusterDto.TotalCpusRecived
+			localCluster.TotalMemoryRecived += clusterDto.TotalMemoryRecived
+		}
+
+		fmt.Println(clusterDto.IncomingPeering, " incoming peering\n")
+		if isPeeringEstablished(clusterDto.IncomingPeering) {
+			localCluster.TotalUsedCpusOffered += clusterDto.TotalUsedCpusOffered
+			localCluster.TotalUsedMemoryOffered += clusterDto.TotalUsedMemoryOffered
+		}
+	}
+
 	localNodeResources := []NodeResourceMetrics{}
 	for i := range localNodeResourceMetrics {
 		localNodeResources = append(localNodeResources, localNodeResourceMetrics[i])
 	}
 	localCluster.LocalResources = &localNodeResources
-	ClusterDtoArray = append(ClusterDtoArray, localCluster)
 
-	return ClusterDtoArray, nil
+	ClustersInfo := make(map[string][]ClusterDto)
+
+	ClustersInfo["local"] = []ClusterDto{localCluster}
+	ClustersInfo["remote"] = ClusterDtoArray
+
+	return ClustersInfo, nil
 }
