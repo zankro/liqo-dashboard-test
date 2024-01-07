@@ -79,14 +79,14 @@ function App() {
       />
       <Container fluid={true} className="navbar-padding">
         <Row>
-          <Col md={2}>
+          {/*<Col md={2}>
             <Sidebar
               onClusterClick={onClusterClick}
               currentClusterName={currentCluster?.name}
               clustersNames={Object.keys(clusters)}
               collapsed={!isHamburgerOpened}
             />
-          </Col>
+      </Col>*/}
           <Col md={10} className="pb-4 myTabs">
             <LiqoNavTabs clusters={clusters} refs={refs} />
             {/* <ClusterList clusters={Object.values(clusters).flat()} refs={refs} /> */}

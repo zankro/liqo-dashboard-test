@@ -429,17 +429,19 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	}
 
 	for i := range ClusterDtoArray {
-		clusterNode := &corev1.NodeList{}
-		if err := cl.List(ctx, clusterNode, client.MatchingLabels{
-			"liqo.io/remote-cluster-id": ClusterDtoArray[i].clusterID,
-		}); err != nil {
-			return nil, err
+		if isPeeringEstablished(ClusterDtoArray[i].OutgoingPeering) {
+			clusterNode := &corev1.NodeList{}
+			if err := cl.List(ctx, clusterNode, client.MatchingLabels{
+				"liqo.io/remote-cluster-id": ClusterDtoArray[i].clusterID,
+			}); err != nil {
+				return nil, err
+			}
+			if len(clusterNode.Items) != 1 {
+				return nil, fmt.Errorf("expected exactly one element in the list of Nodes but got %d", len(clusterNode.Items))
+			}
+			ClusterDtoArray[i].TotalCpusRecived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
+			ClusterDtoArray[i].TotalMemoryRecived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
 		}
-		if len(clusterNode.Items) != 1 {
-			return nil, fmt.Errorf("expected exactly one element in the list of Nodes but got %d", len(clusterNode.Items))
-		}
-		ClusterDtoArray[i].TotalCpusRecived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
-		ClusterDtoArray[i].TotalMemoryRecived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
 	}
 
 	var localCluster ClusterDto
@@ -447,7 +449,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	localCluster.clusterID = "local"
 
 	for _, clusterDto := range ClusterDtoArray {
-		fmt.Println(clusterDto.OutgoingPeering, " outgoing peering\n")
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
 			localCluster.TotalUsedCpusRecived += clusterDto.TotalUsedCpusRecived
 			localCluster.TotalUsedMemoryRecived += clusterDto.TotalUsedMemoryRecived
@@ -455,7 +456,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			localCluster.TotalMemoryRecived += clusterDto.TotalMemoryRecived
 		}
 
-		fmt.Println(clusterDto.IncomingPeering, " incoming peering\n")
 		if isPeeringEstablished(clusterDto.IncomingPeering) {
 			localCluster.TotalUsedCpusOffered += clusterDto.TotalUsedCpusOffered
 			localCluster.TotalUsedMemoryOffered += clusterDto.TotalUsedMemoryOffered
@@ -472,6 +472,5 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 
 	ClustersInfo["local"] = []ClusterDto{localCluster}
 	ClustersInfo["remote"] = ClusterDtoArray
-
 	return ClustersInfo, nil
 }
