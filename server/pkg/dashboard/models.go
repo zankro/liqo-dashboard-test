@@ -20,6 +20,8 @@ type ClusterDto struct {
 	Age                    string                                       `json:"age,omitempty"`
 	TotalUsedCpusOffered   float64                                      `json:"TotalUsedCpusOffered"`
 	TotalUsedMemoryOffered float64                                      `json:"TotalUsedMemoryOffered"`
+	TotalCpusOffered       float64                                      `json:"TotalCpusOffered"`
+	TotalMemoryOffered     float64                                      `json:"TotalMemoryOffered"`
 	TotalUsedMemoryRecived float64                                      `json:"TotalUsedMemoryRecived"`
 	TotalUsedCpusRecived   float64                                      `json:"TotalUsedCpusRecived"`
 	TotalMemoryRecived     float64                                      `json:"TotalMemoryRecived"`
