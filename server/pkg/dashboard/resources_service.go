@@ -459,6 +459,13 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		if isPeeringEstablished(clusterDto.IncomingPeering) {
 			localCluster.TotalUsedCpusOffered += clusterDto.TotalUsedCpusOffered
 			localCluster.TotalUsedMemoryOffered += clusterDto.TotalUsedMemoryOffered
+			resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.LocalLabelSelectorForCluster(clusterDto.clusterID))
+			if err != nil {
+				klog.Warningf("error retrieving resourceOffers: %s", err)
+				return nil, err
+			}
+			localCluster.TotalCpusOffered = resourceOffer.Spec.ResourceQuota.Hard.Cpu().AsApproximateFloat64()
+			localCluster.TotalMemoryOffered = resourceOffer.Spec.ResourceQuota.Hard.Memory().AsApproximateFloat64()
 		}
 	}
 
