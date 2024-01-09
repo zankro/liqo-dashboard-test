@@ -70,7 +70,7 @@ function App() {
 
   return (
     Object.keys(clusters).length > 0 ? 
-    <>
+    <div className='prevent-select'>
       <LiqoNavbar
         onHamburgerClick={() =>
           setHamburgerStatus((oldStatus: Boolean) => !oldStatus)
@@ -87,13 +87,13 @@ function App() {
               collapsed={!isHamburgerOpened}
             />
       </Col>*/}
-          <Col md={10} className="pb-4 myTabs">
+          <Col /*md={10}*/ className="pb-4 myTabs">
             <LiqoNavTabs clusters={clusters} refs={refs} />
             {/* <ClusterList clusters={Object.values(clusters).flat()} refs={refs} /> */}
           </Col>
         </Row>
       </Container>
-    </> :
+    </div> :
     <div>
 
     </div>

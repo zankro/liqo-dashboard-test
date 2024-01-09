@@ -22,3 +22,9 @@
   padding-right: 0 !important;
   padding-left: 0  !important;
 }
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}

@@ -24,7 +24,7 @@ function LiqoNavbar(props: ILiqoNavbar) {
   }
 
   return (
-    <div>
+    
       <div>
         <Navbar bg="dark" variant="dark" fixed="top">
           <Container fluid={true}>
@@ -52,7 +52,7 @@ function LiqoNavbar(props: ILiqoNavbar) {
           </Container>
         </Navbar>
       </div>
-    </div>
+    
   );
 }
 

@@ -3,7 +3,7 @@ import { ForeignCluster } from '../../api/types';
 import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 import Draggable from 'react-draggable';
 import {  Container } from 'react-bootstrap';
-
+import ClusterBarChart from '../clusterComponent/ClusterBarChart/ClusterBarChart';
 
 
 interface FrecceContainerProps {
@@ -31,7 +31,7 @@ interface FrecceContainerProps {
                 key={i}
                 
               />
-              <Xarrow labels={`Latency: ${cluster.Latency.value}\nTimestamp: ${cluster.Latency.timestamp}`} showTail={cluster.incomingPeering==="Established"} start={'elem1'} end={`elem${i+2}`} />
+              <Xarrow endAnchor='top' labels={`Latency: ${cluster.Latency.value}`} showTail={cluster.incomingPeering==="Established"} showHead={cluster.outgoingPeering==="Established"} start={'elem1'} end={`elem${i+2}`} path='grid' />
             </div>
           ))}
         </Xwrapper>
@@ -51,12 +51,12 @@ interface FrecceContainerProps {
   
   }) => {
     const updateXarrow = useXarrow();
-    const x= id=="elem1"?400:700
-    const y= id=="elem1"?50:70*(parseInt(id.substring(4))-3)
+    const x= id=="elem1"?600:700*(parseInt(id.substring(4))-2)
+    const y= id=="elem1"?0:150
     return (
       <Draggable   defaultPosition={{x:x, y:y}}  onDrag={updateXarrow} onStop={updateXarrow}>
         <div className="arrow-box" id={id}>
-          {cluster.name}
+          <ClusterBarChart cluster={cluster} showRam={true}/>
         </div>
       </Draggable>
     );

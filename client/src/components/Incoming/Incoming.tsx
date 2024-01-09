@@ -3,7 +3,6 @@ import Plot from 'react-plotly.js';
 import { ForeignCluster } from '../../api/types';
 import { bytesToGB } from '../../utils/utils';
 import { Button, Container } from 'react-bootstrap';
-import './Offloading.css'
 
 
 export interface IClusterList {
@@ -11,38 +10,52 @@ export interface IClusterList {
   refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 }
 
-function Offloading(props: IClusterList) {
+function Incoming(props: IClusterList) {
   const { clusters } = props;
   const [showRam, setShowRam] = useState(true);
   const localCluster = clusters.local[0];
   clusters.remote = clusters.remote.filter(c => c.outgoingPeering == "Established")
   if (clusters.local.length > 0) {
     return (
-      <Container className='center'>
+      <Container>
                 <Button
                 style={
                   {
+                    marginLeft: '50%',
+                    marginRight: '50%',
                     background: 'white',
                     color: 'black',
                     border: '2px solid linear-gradient(45deg, #add8e6, #87CEFA)',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
                   }
                 }
-                onClick={() => setShowRam((oldshowRam)=>!oldshowRam)}>{showRam?"Mostra CPU":"Mostra RAM"}
+                onClick={() => setShowRam((oldshowRam)=>!oldshowRam)}>{showRam?"RAM":"CPU"}
                 </Button>
-                <ClusterChart
-                          cluster={localCluster}
-                          showRam={showRam}
-                        />
-                <Container className='d-flex flex-row justify-content-center align-self-center'>
+                <Container>
                 {
                   clusters.remote.map((cluster, i) => {
-                    return(
-                      <ClusterChart
-                      cluster={cluster}
-                      showRam={showRam}
-                      key={i}
-                      />
-                    )
+                    if(i!=clusters.remote.length/2)
+                        return<>
+                          <ClusterChart
+                            cluster={cluster}
+                            showRam={showRam}
+                            key={i}
+                          />
+                          </>
+                    else
+                      return<>
+                          <ClusterChart
+                          cluster={localCluster}
+                          showRam={showRam}
+                          key={i}
+                        />
+                        <ClusterChart
+                          cluster={cluster}
+                          showRam={showRam}
+                          key={i}
+                        />
+                        </>
                   })  
                 }
               </Container>
@@ -61,7 +74,7 @@ interface ClusterChartProps {
 
 function ClusterChart({ cluster, showRam }: ClusterChartProps) {
   return (
-    <div> 
+    <>
       <Plot
         key={cluster.name}
         data={[
@@ -88,19 +101,19 @@ function ClusterChart({ cluster, showRam }: ClusterChartProps) {
         ]}
         layout={{
           title:cluster.name,
-          width: 400,
-          height: 400,
+          width: 500,
+          height: 500,
           barmode: 'stack',
           yaxis: {
             type: 'log',
             autorange: true,
             showticklabels: false,
             showgrid: false,
-          }
+          },
         }}
       />
-    </div>
+    </>
   );
 }
 
-export default Offloading;
+export default Incoming;

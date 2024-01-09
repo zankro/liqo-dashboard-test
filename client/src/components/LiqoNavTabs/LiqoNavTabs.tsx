@@ -3,6 +3,7 @@ import { Container }  from 'react-bootstrap';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Offloading from '../Offloading/Offloading';
+import Incoming from '../Incoming/Incoming';
 import FrecceContainer  from '../FrecceContainer/FrecceContainer';
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
@@ -13,6 +14,7 @@ function LiqoNavTabs(props: IClusterList) {
   const { clusters, refs } = props;
   console.log(clusters);
   const localCluster = clusters.local[0];
+  console.log(clusters.remote);
   return (
     <Tabs
       defaultActiveKey="offloading"
@@ -40,7 +42,7 @@ function LiqoNavTabs(props: IClusterList) {
           </Container>
       </Tab>
       <Tab eventKey="incoming" title="Incoming">
-        {/* <Incoming /> */}
+        <Incoming clusters={clusters} refs={refs}/>
       </Tab>
     </Tabs>
   );
