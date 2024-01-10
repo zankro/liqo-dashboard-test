@@ -5,6 +5,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import Offloading from '../Offloading/Offloading';
 import Incoming from '../Incoming/Incoming';
 import FrecceContainer  from '../FrecceContainer/FrecceContainer';
+import './LiqoNavTabs.css';
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
   refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
@@ -21,6 +22,12 @@ function LiqoNavTabs(props: IClusterList) {
       id="uncontrolled-tab-example"
       className="mb-3 vcenter"
       fill
+      style={
+        {
+          width:"100%",
+          borderRadius: "0px"
+        }
+      }
     >
       <Tab eventKey="offloading" title="Offloading">
         <Offloading clusters={clusters} refs={refs} />

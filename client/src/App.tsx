@@ -5,8 +5,6 @@ import { ForeignCluster } from './api/types';
 import API from './api/API';
 import './App.css';
 import LiqoNavbar from './components/Navbar/Navbar';
-import Sidebar from './components/Sidebar/Sidebar';
-import ClusterList from './components/clusterComponent/ClusterList';
 import LiqoNavTabs from './components/LiqoNavTabs/LiqoNavTabs'
 
 function App() {

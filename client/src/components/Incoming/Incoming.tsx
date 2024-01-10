@@ -4,7 +4,6 @@ import { ForeignCluster } from '../../api/types';
 import { bytesToGB } from '../../utils/utils';
 import { Button, Container } from 'react-bootstrap';
 
-
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
   refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
@@ -14,53 +13,29 @@ function Incoming(props: IClusterList) {
   const { clusters } = props;
   const [showRam, setShowRam] = useState(true);
   const localCluster = clusters.local[0];
-  clusters.remote = clusters.remote.filter(c => c.outgoingPeering == "Established")
+  clusters.remote = clusters.remote.filter(
+    c => c.incomingPeering == 'Established'
+  );
   if (clusters.local.length > 0) {
     return (
-      <Container>
-                <Button
-                style={
-                  {
-                    marginLeft: '50%',
-                    marginRight: '50%',
-                    background: 'white',
-                    color: 'black',
-                    border: '2px solid linear-gradient(45deg, #add8e6, #87CEFA)',
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                  }
-                }
-                onClick={() => setShowRam((oldshowRam)=>!oldshowRam)}>{showRam?"RAM":"CPU"}
-                </Button>
-                <Container>
-                {
-                  clusters.remote.map((cluster, i) => {
-                    if(i!=clusters.remote.length/2)
-                        return<>
-                          <ClusterChart
-                            cluster={cluster}
-                            showRam={showRam}
-                            key={i}
-                          />
-                          </>
-                    else
-                      return<>
-                          <ClusterChart
-                          cluster={localCluster}
-                          showRam={showRam}
-                          key={i}
-                        />
-                        <ClusterChart
-                          cluster={cluster}
-                          showRam={showRam}
-                          key={i}
-                        />
-                        </>
-                  })  
-                }
-              </Container>
+      <Container className="center">
+        <Button
+          style={{
+            background: 'white',
+            color: 'black',
+            border: '2px solid linear-gradient(45deg, #add8e6, #87CEFA)',
+          }}
+          onClick={() => setShowRam(oldshowRam => !oldshowRam)}
+        >
+          {showRam ? 'Mostra CPU' : 'Mostra RAM'}
+        </Button>
+        <ClusterChart cluster={localCluster} showRam={showRam} />
+        <Container className="d-flex flex-row justify-content-center align-self-center">
+          {clusters.remote.map((cluster, i) => {
+            return <ClusterChart cluster={cluster} showRam={showRam} key={i} />;
+          })}
+        </Container>
       </Container>
-
     );
   } else {
     return <div> Loading... </div>;
@@ -73,6 +48,7 @@ interface ClusterChartProps {
 }
 
 function ClusterChart({ cluster, showRam }: ClusterChartProps) {
+  console.log(cluster);
   return (
     <>
       <Plot
@@ -82,8 +58,8 @@ function ClusterChart({ cluster, showRam }: ClusterChartProps) {
             x: [showRam ? 'Memory (GB)' : 'CPU'],
             y: [
               showRam
-                ? bytesToGB(cluster.TotalUsedMemoryRecived)
-                : cluster.TotalUsedCpusRecived,
+                ? bytesToGB(cluster.TotalUsedMemoryOffered)
+                : cluster.TotalUsedCpusOffered,
             ],
             type: 'bar',
             name: 'Used',
@@ -92,15 +68,15 @@ function ClusterChart({ cluster, showRam }: ClusterChartProps) {
             x: [showRam ? 'Memory (GB)' : 'CPU'],
             y: [
               showRam
-                ? bytesToGB(cluster.TotalMemoryRecived)
-                : cluster.TotalCpusRecived,
+                ? bytesToGB(cluster.TotalMemoryOffered)
+                : cluster.TotalCpusOffered,
             ],
             type: 'bar',
             name: 'Total',
           },
         ]}
         layout={{
-          title:cluster.name,
+          title: cluster.name,
           width: 500,
           height: 500,
           barmode: 'stack',

@@ -442,6 +442,15 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			ClusterDtoArray[i].TotalCpusRecived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
 			ClusterDtoArray[i].TotalMemoryRecived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
 		}
+		if isPeeringEstablished(ClusterDtoArray[i].IncomingPeering) {
+			resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.LocalLabelSelectorForCluster(ClusterDtoArray[i].clusterID))
+			if err != nil {
+				klog.Warningf("error retrieving resourceOffers: %s", err)
+				return nil, err
+			}
+			ClusterDtoArray[i].TotalCpusOffered = resourceOffer.Spec.ResourceQuota.Hard.Cpu().AsApproximateFloat64()
+			ClusterDtoArray[i].TotalMemoryOffered = resourceOffer.Spec.ResourceQuota.Hard.Memory().AsApproximateFloat64()
+		}
 	}
 
 	var localCluster ClusterDto
@@ -459,13 +468,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		if isPeeringEstablished(clusterDto.IncomingPeering) {
 			localCluster.TotalUsedCpusOffered += clusterDto.TotalUsedCpusOffered
 			localCluster.TotalUsedMemoryOffered += clusterDto.TotalUsedMemoryOffered
-			resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.LocalLabelSelectorForCluster(clusterDto.clusterID))
-			if err != nil {
-				klog.Warningf("error retrieving resourceOffers: %s", err)
-				return nil, err
-			}
-			localCluster.TotalCpusOffered = resourceOffer.Spec.ResourceQuota.Hard.Cpu().AsApproximateFloat64()
-			localCluster.TotalMemoryOffered = resourceOffer.Spec.ResourceQuota.Hard.Memory().AsApproximateFloat64()
+			localCluster.TotalMemoryOffered += clusterDto.TotalMemoryOffered
+			localCluster.TotalCpusOffered += clusterDto.TotalCpusOffered
 		}
 	}
 

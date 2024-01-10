@@ -13,6 +13,8 @@ export type ForeignCluster = {
   TotalUsedCpusRecived: number;
   TotalMemoryRecived: number;
   TotalCpusRecived: number;
+  TotalMemoryOffered: number;
+  TotalCpusOffered: number;
   Latency: ConnectionLatency;
   localResources: LocalResources[];
 };
