@@ -5,15 +5,16 @@ import { ForeignCluster } from './api/types';
 import API from './api/API';
 import './App.css';
 import LiqoNavbar from './components/Navbar/Navbar';
-import LiqoNavTabs from './components/LiqoNavTabs/LiqoNavTabs'
+import LiqoNavTabs from './components/LiqoNavTabs/LiqoNavTabs';
 
 function App() {
-  const [clusters, setClusters] = useState<{ [key: string]: ForeignCluster[] }>({});
+  const [clusters, setClusters] = useState<{ [key: string]: ForeignCluster[] }>(
+    {}
+  );
   const [currentCluster, setCurrentCluster] = useState<ForeignCluster>();
   const [init, setInit] = useState<Boolean>(true);
-  const [isHamburgerOpened, setHamburgerStatus] = useState<Boolean>(false);
+  const [showRam, setShowRam] = useState<boolean>(true);
   const refs = useRef<Array<HTMLDivElement | null>>([]);
-
   const fetchAndSetCluster = useCallback(() => {
     API.getPeerings().then(fetchedClusters => {
       setClusters(fetchedClusters);
@@ -24,8 +25,6 @@ function App() {
       }
     });
   }, [currentCluster]);
-
-  console.log(clusters);
 
   useEffect(() => {
     if (init) {
@@ -48,33 +47,19 @@ function App() {
         const top: number = ref?.getBoundingClientRect().top || 0;
         return top < 300 && top > -300;
       });
-      if (index !== -1 && clusters[Object.keys(clusters)[index]][0] !== currentCluster) {
+      if (
+        index !== -1 &&
+        clusters[Object.keys(clusters)[index]][0] !== currentCluster
+      ) {
         setCurrentCluster(clusters[Object.keys(clusters)[index]][0]);
       }
     };
     window.addEventListener('scroll', onScroll);
   }, [currentCluster, clusters]);
 
-  function onClusterClick(clusterName: string) {
-    const clusterIndex = Object.keys(clusters).findIndex(
-      (name: string) => name === clusterName
-    );
-    if (clusterIndex !== -1) {
-      refs.current[clusterIndex]?.scrollIntoView({
-        behavior: 'smooth',
-      });
-    }
-  }
-
-  return (
-    Object.keys(clusters).length > 0 ? 
-    <div className='prevent-select'>
-      <LiqoNavbar
-        onHamburgerClick={() =>
-          setHamburgerStatus((oldStatus: Boolean) => !oldStatus)
-        }
-        isHamburgerOpened={isHamburgerOpened}
-      />
+  return Object.keys(clusters).length > 0 ? (
+    <div className="prevent-select">
+      <LiqoNavbar showRam={showRam} setShowRam={setShowRam} />
       <Container fluid={true} className="navbar-padding">
         <Row>
           {/*<Col md={2}>
@@ -86,17 +71,15 @@ function App() {
             />
       </Col>*/}
           <Col /*md={10}*/ className="pb-4 myTabs">
-            <LiqoNavTabs clusters={clusters} refs={refs} />
+            <LiqoNavTabs showRam={showRam} clusters={clusters} refs={refs} />
             {/* <ClusterList clusters={Object.values(clusters).flat()} refs={refs} /> */}
           </Col>
         </Row>
       </Container>
-    </div> :
-    <div>
-
     </div>
+  ) : (
+    <div></div>
   );
 }
-
 
 export default App;

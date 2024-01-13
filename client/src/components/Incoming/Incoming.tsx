@@ -13,7 +13,7 @@ function Incoming(props: IClusterList) {
   const { clusters } = props;
   const [showRam, setShowRam] = useState(true);
   const localCluster = clusters.local[0];
-  clusters.remote = clusters.remote.filter(
+  const incomingClusters = clusters.remote.filter(
     c => c.incomingPeering == 'Established'
   );
   if (clusters.local.length > 0) {
@@ -31,7 +31,7 @@ function Incoming(props: IClusterList) {
         </Button>
         <ClusterChart cluster={localCluster} showRam={showRam} />
         <Container className="d-flex flex-row justify-content-center align-self-center">
-          {clusters.remote.map((cluster, i) => {
+          {incomingClusters.map((cluster, i) => {
             return <ClusterChart cluster={cluster} showRam={showRam} key={i} />;
           })}
         </Container>
@@ -48,7 +48,6 @@ interface ClusterChartProps {
 }
 
 function ClusterChart({ cluster, showRam }: ClusterChartProps) {
-  console.log(cluster);
   return (
     <>
       <Plot

@@ -2,7 +2,7 @@ import { ForeignCluster } from './types';
 
 function getPeerings(): Promise<{ [key: string]: ForeignCluster[] }> {
   return get<{ [key: string]: ForeignCluster[] }>(
-      'http://localhost:8089/api/foreign_clusters'
+    'http://localhost:8089/api/foreign_clusters'
   )
     .then((clusters: { [key: string]: ForeignCluster[] }) => {
       return clusters;
@@ -11,7 +11,6 @@ function getPeerings(): Promise<{ [key: string]: ForeignCluster[] }> {
       console.error('Error fetching the clusters');
       throw Error(`Error fetching the clusters: ${err}`);
     });
-
 }
 
 function get<T>(url: string): Promise<T> {

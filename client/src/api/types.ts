@@ -17,6 +17,10 @@ export type ForeignCluster = {
   TotalCpusOffered: number;
   Latency: ConnectionLatency;
   localResources: LocalResources[];
+  TotalUsedLocalCpus: number;
+  TotalUsedLocalMemory: number;
+  TotalLocalCpus: number;
+  TotalLocalMemory: number;
 };
 
 export type NodeResourceMetrics = {
@@ -27,27 +31,27 @@ export type NodeResourceMetrics = {
 };
 
 export type PodResourceMetrics = {
-  Name: string                    
-	ContainersResources: ContainerResourceMetrics[];
-	TotalMemor: number;
-	TotalCpus: number;
+  Name: string;
+  ContainersResources: ContainerResourceMetrics[];
+  TotalMemor: number;
+  TotalCpus: number;
 };
 
 export type ContainerResourceMetrics = {
-  Name:        string;
+  Name: string;
   TotalMemory: number;
-  TotalCpus:   number;
-}
+  TotalCpus: number;
+};
 
 export type ConnectionLatency = {
   value: string;
   timestamp: string;
-}
+};
 
 export type LocalResources = {
   NodetotalCpus: number;
   NodetotalMemory: number;
-}
+};
 /*
 	clusterID              string
 	Name                   string                                       `json:"name"`

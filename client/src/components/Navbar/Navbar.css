@@ -1,0 +1,53 @@
+.center {
+    margin: auto;
+    width: 50%;
+}
+
+.custom-toggle {
+    color: white;
+    width: 100px;
+}
+.react-toggle{
+    width: 100px;
+    font-size: x-large;
+    text-align: center;
+}
+
+
+.react-toggle-track{
+    width: 100px;
+    height: 40px;
+    
+}
+
+.react-toggle-track-x{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+}
+
+.react-toggle-track-check{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+}
+
+.react-toggle-thumb{
+    width: 35px;
+    height: 35px;
+    top:3px;
+}
+
+.react-toggle--unchecked .react-toggle-thumb{
+    left: 0px;
+}
+
+.react-toggle--checked .react-toggle-thumb{
+    left: 65px;
+}

@@ -41,8 +41,6 @@ export function getHighestUnit(bytes: number): string {
     bytes /= 1024;
     unitIndex++;
   }
-  console.log(`${bytes?.toFixed(1)} ${units[unitIndex]}`);
-  // return `${bytes?.toFixed(1)} ${units[unitIndex]}`;
   return `${bytes?.toFixed(1)}`;
 }
 
@@ -78,6 +76,5 @@ function getIsoFormattedDate(s: string): string {
 }
 
 export function bytesToGB(bytes: number): number {
-  console.log(bytes / Math.pow(10, 9));
   return bytes / Math.pow(10, 9);
 }
