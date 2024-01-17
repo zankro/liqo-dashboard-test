@@ -57,8 +57,8 @@ function LocalClusterTreemapChart({
               'Local Cluster',
               ...remoteClusters.flatMap(cluster => [
                 cluster.name,
-                'Remaining',
-                'Used',
+                cluster.name + ' Remaining',
+                cluster.name + ' Used',
               ]),
               'Local Resources',
               'Remaining',
@@ -75,6 +75,7 @@ function LocalClusterTreemapChart({
               'Local Resources',
               'Local Resources',
             ],
+            branchvalues: "total",
             type: 'treemap',
             domain: { x: [0, 1], y: [0, 1], column: 10, row: 10 },
             values: [
