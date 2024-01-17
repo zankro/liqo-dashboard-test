@@ -82,7 +82,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
           </Tooltip>
         }
       >
-        <Container className="d-flex flex-column justify-content-center align-items-center">
+        <Container  className="overflow-hidden d-flex flex-column justify-content-center align-items-center">
           {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
           {cluster.name !== 'Local Cluster' ? (
             <BsCircleFill
@@ -96,7 +96,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
               }
             />
           ) : (
-            <GrCloudComputer size={80} />
+            <GrCloudComputer size={80} id="LocalCluster" />
           )}
         </Container>
       </OverlayTrigger>

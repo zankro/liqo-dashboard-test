@@ -6,6 +6,8 @@ import Offloading from '../Offloading/Offloading';
 import Incoming from '../Incoming/Incoming';
 import FrecceContainer from '../FrecceContainer/FrecceContainer';
 import './LiqoNavTabs.css';
+import { useXarrow } from 'react-xarrows';
+
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
   showRam: boolean;
@@ -29,7 +31,7 @@ function LiqoNavTabs(props: IClusterList) {
       <Tab eventKey="offloading" title="Offloading">
         <Offloading showRam={showRam} clusters={clusters} refs={refs} />
       </Tab>
-      <Tab eventKey="map" title="Map">
+      <Tab eventKey="map" title="Map" onClick={()=>useXarrow()}>
         <Container
           style={{
             display: 'flex',
