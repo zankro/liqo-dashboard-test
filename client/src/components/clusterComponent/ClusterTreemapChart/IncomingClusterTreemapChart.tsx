@@ -15,6 +15,7 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
   localCluster,
   showRam,
 }) => {
+  console.log(remoteClusters);
   const hashString = (str: string) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
