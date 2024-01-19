@@ -1,11 +1,16 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ForeignCluster } from './api/types';
+import DefaultLayout from './DefaultLayout';
 import API from './api/API';
 import './App.css';
-import LiqoNavbar from './components/Navbar/Navbar';
-import LiqoNavTabs from './components/LiqoNavTabs/LiqoNavTabs';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import LayoutFrecceContainer from './components/FrecceContainer';
+import NotFoundPage from './NotFoundPage';
+import Offloading from './components/Offloading';
+import Incoming from './components/Incoming';
+import { capitalizeFirstLetter } from './utils/utils';
 
 function App() {
   const [clusters, setClusters] = useState<{ [key: string]: ForeignCluster[] }>(
@@ -14,15 +19,22 @@ function App() {
   const [currentCluster, setCurrentCluster] = useState<ForeignCluster>();
   const [init, setInit] = useState<Boolean>(true);
   const [showRam, setShowRam] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true); // Aggiungi questa linea
   const refs = useRef<Array<HTMLDivElement | null>>([]);
+
   const fetchAndSetCluster = useCallback(() => {
     API.getPeerings().then(fetchedClusters => {
+      fetchedClusters.local[0].name = capitalizeFirstLetter(fetchedClusters.local[0].name)
+      fetchedClusters.remote.forEach(cluster => {
+        cluster.name = capitalizeFirstLetter(cluster.name)
+      }) 
       setClusters(fetchedClusters);
       if (Object.keys(fetchedClusters).length > 0) {
         if (!currentCluster) {
           setCurrentCluster(fetchedClusters.local[0]);
         }
       }
+      setIsLoading(false); // Aggiungi questa linea
     });
   }, [currentCluster]);
 
@@ -57,28 +69,42 @@ function App() {
     window.addEventListener('scroll', onScroll);
   }, [currentCluster, clusters]);
 
-  return Object.keys(clusters).length > 0 ? (
-    <div className="prevent-select">
-      <LiqoNavbar showRam={showRam} setShowRam={setShowRam} />
-      <Container fluid={true} className="navbar-padding">
-        <Row>
-          {/*<Col md={2}>
-            <Sidebar
-              onClusterClick={onClusterClick}
-              currentClusterName={currentCluster?.name}
-              clustersNames={Object.keys(clusters)}
-              collapsed={!isHamburgerOpened}
-            />
-      </Col>*/}
-          <Col /*md={10}*/ className="pb-4 myTabs">
-            <LiqoNavTabs showRam={showRam} clusters={clusters} refs={refs} />
-            {/* <ClusterList clusters={Object.values(clusters).flat()} refs={refs} /> */}
-          </Col>
-        </Row>
-      </Container>
-    </div>
-  ) : (
-    <div></div>
+
+  return (
+    <BrowserRouter>
+      <AnimatePresence mode="wait">
+        <Routes>
+            <Route
+              path="/"
+              element={
+                <DefaultLayout loading= {isLoading} showRam={showRam} setShowRam={setShowRam} />
+              }
+            >
+              <Route
+            path="/"
+            element={
+              <LayoutFrecceContainer
+                clusters={clusters}
+                showRam={showRam}
+                refs={refs}
+              />
+            }
+          />
+          <Route
+            path="Offloading"
+            element={
+              <Offloading showRam={showRam} clusters={clusters} refs={refs} />
+            }
+          />
+          <Route
+            path="Incoming"
+            element={<Incoming showRam={showRam} clusters={clusters} refs={refs} />}
+          />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+        </Routes>
+      </AnimatePresence>
+    </BrowserRouter>
   );
 }
 

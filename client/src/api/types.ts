@@ -6,7 +6,7 @@ export type ForeignCluster = {
   incomingPeering: string;
   age: string;
   outgoingResources: NodeResourceMetrics[];
-  incomingResources: NodeResourceMetrics[];
+  incomingResources: PodResourceMetrics[];
   TotalUsedCpusOffered: number;
   TotalUsedMemoryOffered: number;
   TotalUsedMemoryRecived: number;
@@ -31,14 +31,14 @@ export type NodeResourceMetrics = {
 };
 
 export type PodResourceMetrics = {
-  Name: string;
-  ContainersResources: ContainerResourceMetrics[];
-  TotalMemor: number;
-  TotalCpus: number;
+  name: string;
+  containersResources: ContainerResourceMetrics[];
+  PodTotalMemory: number;
+  PodTotalCpus: number;
 };
 
 export type ContainerResourceMetrics = {
-  Name: string;
+  name: string;
   TotalMemory: number;
   TotalCpus: number;
 };
@@ -49,8 +49,8 @@ export type ConnectionLatency = {
 };
 
 export type LocalResources = {
-  NodetotalCpus: number;
-  NodetotalMemory: number;
+  nodeTotalCpus: number;
+  nodeTotalMemory: number;
 };
 /*
 	clusterID              string

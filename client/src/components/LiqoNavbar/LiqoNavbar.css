@@ -3,6 +3,10 @@
     width: 50%;
 }
 
+.navbar{
+    margin-bottom:60px;
+}
+
 .custom-toggle {
     color: white;
     width: 100px;
@@ -50,4 +54,40 @@
 
 .react-toggle--checked .react-toggle-thumb{
     left: 65px;
+}
+
+.customTab{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+}
+
+
+.nav-tabs{
+    text-decoration: none;
+    border-radius: 0px!important;
+    color: rgba(255,255,255,0.5);
+    background-color: rgba(33,37,41,1);
+}
+
+.nav-tabs:active {
+    background-color: rgba(33,37,41,1);
+    border-color: rgba(33,37,41,1);
+}
+
+.nav-tabs:hover {
+    border-color: rgba(33,37,41,0.9);
+    border-radius: 20px!important;
+}
+
+.tab-content{
+    width: 100%;
+}
+
+a{
+    text-decoration: none!important;
+    color: none!important;
+    font-size:large;
 }

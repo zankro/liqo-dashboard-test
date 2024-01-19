@@ -23,7 +23,7 @@ const ClusterBox: React.FC<ClusterBoxProps> = ({
               paddingBottom: '40px',
             }}>
             {clusters.map((cluster) => 
-                <ClusterBubbleChart cluster={cluster} showRam={showRam} />            
+                <ClusterBubbleChart cluster={cluster} showRam={showRam} key={cluster.name}/>            
             )}
       </div>
   );

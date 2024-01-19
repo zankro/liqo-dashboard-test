@@ -75,6 +75,11 @@ function getIsoFormattedDate(s: string): string {
   return removeCharAt(lastSpaceIndex, dateWithoutTimezone);
 }
 
-export function bytesToGB(bytes: number): number {
-  return bytes / Math.pow(10, 9);
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
+
+export function bytesToGB(bytes: number): number {
+  return parseFloat((bytes / Math.pow(2, 30)).toFixed(2));
+}
+

@@ -43,8 +43,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
     </p>,
   ];
   if (
-    cluster.incomingPeering === 'Established' ||
-    cluster.name === 'Local Cluster'
+    cluster.incomingPeering === 'Established'
   ) {
     hoverText.push(
       <p key="incoming">
@@ -55,8 +54,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
     );
   }
   if (
-    cluster.outgoingPeering === 'Established' ||
-    cluster.name === 'Local Cluster'
+    cluster.outgoingPeering === 'Established'
   ) {
     hoverText.push(
       <p key="outgoing">
@@ -84,7 +82,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
       >
         <Container  className="overflow-hidden d-flex flex-column justify-content-center align-items-center">
           {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
-          {cluster.name !== 'Local Cluster' ? (
+          {cluster.networking !== "" ? (
             <BsCircleFill
               size={5 * size}
               color={
@@ -96,7 +94,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
               }
             />
           ) : (
-            <GrCloudComputer size={80} id="LocalCluster" />
+            <GrCloudComputer size={80} id={cluster.name} />
           )}
         </Container>
       </OverlayTrigger>

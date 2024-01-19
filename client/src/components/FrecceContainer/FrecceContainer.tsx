@@ -27,16 +27,14 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
     >
       <Xwrapper>
         <Container className='d-flex flex-column justify-content-between'>
-            <div  onClick={()=> {  console.log("click");
-  useXarrow();}} style={{
+            <div style={{
     paddingBottom: '100px',
   }}>
                   <ClusterBubbleChart cluster={localCluster} showRam={showRam}/>            
             </div>
             <Container className="d-flex flex-row justify-content-between" >
                 {remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering !== "Established").length > 0 ? <>
-                  <Card  onClick={()=> {  console.log("click");
-  useXarrow();}} >
+                  <Card>
                   <ClusterBox 
                     clusters={remoteClusters.filter(cluster => cluster.incomingPeering === 'Established'  && cluster.outgoingPeering !== "Established")}
                     id={`incoming`}
@@ -48,7 +46,8 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                 <Xarrow
                   endAnchor="top"
                   showTail={true}
-                  start={'LocalCluster'}
+                  start={localCluster.name}
+                  key={"incomingArrow"}
                   end={`incoming`}
                 />
                 </>: "" }
@@ -68,7 +67,8 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                   endAnchor="top"
                   showTail={true}
                   showHead={true}
-                  start={'LocalCluster'}
+                  start={localCluster.name}
+                  key={"bothArrow"}
                   end={`both`}
                 />
                 </> : "" }
@@ -86,7 +86,8 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                 <Xarrow
                   endAnchor="top"
                   showHead={true}
-                  start={'LocalCluster'}
+                  start={localCluster.name}
+                  key={"outgoingArrow"}
                   end={`outgoing`}
                 /> 
                 </>: ""}

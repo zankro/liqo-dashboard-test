@@ -54,7 +54,7 @@ function LocalClusterTreemapChart({
         data={[
           {
             labels: [
-              'Local Cluster',
+              localCluster.name,
               ...remoteClusters.flatMap(cluster => [
                 cluster.name,
                 cluster.name + ' Remaining',
@@ -67,11 +67,11 @@ function LocalClusterTreemapChart({
             parents: [
               '',
               ...remoteClusters.flatMap(cluster => [
-                'Local Cluster',
+                localCluster.name,
                 cluster.name,
                 cluster.name,
               ]),
-              'Local Cluster',
+              localCluster.name,
               'Local Resources',
               'Local Resources',
             ],
@@ -121,6 +121,7 @@ function LocalClusterTreemapChart({
           },
         ]}
         layout={{
+          title:localCluster.name,
           autosize: true,
         }}
       />

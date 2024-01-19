@@ -11,7 +11,7 @@ const fakeResponse = [
   {
     "local": [
       {
-        "name": "Local Cluster",
+        "name": "Rome",
         "networking": "",
         "authentication": "",
         "outgoingPeering": "",
@@ -48,8 +48,8 @@ const fakeResponse = [
                     "ContainertotalCpus": 0
                   }
                 ],
-                "PodtotalMemory": 12455936,
-                "PodtotalCpus": 0
+                "PodTotalMemory": 12455936,
+                "PodTotalCpus": 0
               }
             ]
           }
@@ -74,8 +74,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 13037568,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 13037568,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -86,8 +86,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12808192,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12808192,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -98,8 +98,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12677120,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12677120,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:19 +0100 CET",
@@ -136,8 +136,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -148,8 +148,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -160,8 +160,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -198,8 +198,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -210,8 +210,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -222,8 +222,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -259,8 +259,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -271,8 +271,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -283,8 +283,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -320,8 +320,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -332,8 +332,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -344,8 +344,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -381,8 +381,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -393,8 +393,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -405,8 +405,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -442,8 +442,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -454,8 +454,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -466,8 +466,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -504,8 +504,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -516,8 +516,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -528,8 +528,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
@@ -566,8 +566,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12099584,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12099584,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote3",
@@ -578,8 +578,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 12865536,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 12865536,
+            "PodTotalCpus": 0
           },
           {
             "name": "nginx-remote4",
@@ -590,8 +590,8 @@ const fakeResponse = [
                 "ContainertotalCpus": 0
               }
             ],
-            "PodtotalMemory": 11702272,
-            "PodtotalCpus": 0
+            "PodTotalMemory": 11702272,
+            "PodTotalCpus": 0
           }
         ],
         "age": "2024-01-11 18:52:25 +0100 CET",
