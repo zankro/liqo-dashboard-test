@@ -32,6 +32,7 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
   }}>
                   <ClusterBubbleChart cluster={localCluster} showRam={showRam}/>            
             </div>
+
             <Container className="d-flex flex-row justify-content-between" >
                 {remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering !== "Established").length > 0 ? <>
                   <Card>
