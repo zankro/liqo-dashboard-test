@@ -27,23 +27,21 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
     >
       <Xwrapper>
         <Container className='d-flex flex-column justify-content-between'>
-            <div  onClick={()=> {  console.log("click");
-  useXarrow();}} style={{
-    paddingBottom: '100px',
-  }}>
+
+            <div style={{ paddingBottom: '100px',}}>
                   <ClusterBubbleChart cluster={localCluster} showRam={showRam}/>            
             </div>
+
             <Container className="d-flex flex-row justify-content-between" >
                 {remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering !== "Established").length > 0 ? <>
-                  <Card  onClick={()=> {  console.log("click");
-  useXarrow();}} >
-                  <ClusterBox 
-                    clusters={remoteClusters.filter(cluster => cluster.incomingPeering === 'Established'  && cluster.outgoingPeering !== "Established")}
-                    id={`incoming`}
-                    key={"incoming"}
-                    showRam={showRam}
-                  />
-              </Card>
+                  <Card  onClick={()=> {  console.log("click"); useXarrow();}} >
+                    <ClusterBox 
+                      clusters={remoteClusters.filter(cluster => cluster.incomingPeering === 'Established'  && cluster.outgoingPeering !== "Established")}
+                      id={`incoming`}
+                      key={"incoming"}
+                      showRam={showRam}
+                    />
+                  </Card>
             
                 <Xarrow
                   endAnchor="top"

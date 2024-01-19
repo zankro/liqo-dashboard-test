@@ -19,7 +19,7 @@ function LiqoNavTabs(props: IClusterList) {
   const localCluster = clusters.local[0];
   return (
     <Tabs
-      defaultActiveKey="offloading"
+      defaultActiveKey="map"
       id="uncontrolled-tab-example"
       className="mb-3 vcenter"
       fill

@@ -36,6 +36,7 @@
     justify-content: center;
     align-items: center;
     width: auto;
+   
 }
 
 .react-toggle-thumb{
@@ -50,4 +51,13 @@
 
 .react-toggle--checked .react-toggle-thumb{
     left: 65px;
+}
+
+.react-toggle--checked .react-toggle-track {
+    background-color: #395cb3;
+    
+}
+
+.react-toggle--checked > *:not(.react-toggle-thumb) {
+    background-color: #395cb3 !important   
 }
