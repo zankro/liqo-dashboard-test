@@ -42,9 +42,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
       {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
     </p>,
   ];
-  if (
-    cluster.incomingPeering === 'Established'
-  ) {
+  if (cluster.incomingPeering === 'Established') {
     hoverText.push(
       <p key="incoming">
         {showRam
@@ -53,9 +51,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
       </p>
     );
   }
-  if (
-    cluster.outgoingPeering === 'Established'
-  ) {
+  if (cluster.outgoingPeering === 'Established') {
     hoverText.push(
       <p key="outgoing">
         {showRam
@@ -80,9 +76,9 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
           </Tooltip>
         }
       >
-        <Container  className="overflow-hidden d-flex flex-column justify-content-center align-items-center">
+        <Container className="overflow-hidden d-flex flex-column justify-content-center align-items-center">
           {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
-          {cluster.networking !== "" ? (
+          {cluster.networking !== '' ? (
             <BsCircleFill
               size={5 * size}
               color={
