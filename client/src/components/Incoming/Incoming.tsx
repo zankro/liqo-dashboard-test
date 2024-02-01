@@ -30,7 +30,7 @@ function Incoming(props: IClusterList) {
 
         <Container className="clustersChart">
           {incomingClusters.map(cluster => (
-            <Container className="podsChart">
+            <Container className="podsChart" key={cluster.name}>
               <PodsHorizontalBarChart cluster={cluster} showRam={showRam} />
             </Container>
           ))}

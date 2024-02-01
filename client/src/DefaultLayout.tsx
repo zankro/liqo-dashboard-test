@@ -1,6 +1,6 @@
 import LiqoNavbar from './components/LiqoNavbar/LiqoNavbar';
 import { Outlet } from 'react-router-dom';
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion';
 export interface LayoutProps {
   showRam: boolean;
   setShowRam: (showRam: boolean) => void;
@@ -8,7 +8,7 @@ export interface LayoutProps {
 }
 
 function Layout(props: LayoutProps) {
-  const { showRam, setShowRam,loading } = props;
+  const { showRam, setShowRam, loading } = props;
   return (
     <div
       style={{
@@ -17,14 +17,20 @@ function Layout(props: LayoutProps) {
       }}
     >
       <LiqoNavbar showRam={showRam} setShowRam={setShowRam} />
-      {loading?<div>
-            <img src={'/LoadingGif.gif'} alt="loading" />
-            Loading...
-          </div>:  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-  ><Outlet /></motion.div>}
+      {loading ? (
+        <div className="d-flex justify-content-center align-items-center">
+          Loading...
+          <img height={50} width={50} src={'/LoadingGif.gif'} alt="loading" />
+        </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <Outlet />
+        </motion.div>
+      )}
     </div>
   );
 }

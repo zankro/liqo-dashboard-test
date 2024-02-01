@@ -10,11 +10,9 @@ interface IncomingClusterTreemapChartProps {
   showRam: boolean;
 }
 
-const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = ({
-  remoteClusters,
-  localCluster,
-  showRam,
-}) => {
+const IncomingClusterTreemapChart: React.FC<
+  IncomingClusterTreemapChartProps
+> = ({ remoteClusters, localCluster, showRam }) => {
   const hashString = (str: string) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -45,7 +43,7 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
         darkenColor(clusterColor, 1),
         darkenColor(clusterColor, 4),
       ];
-    })
+    }),
   ];
 
   return (
@@ -73,18 +71,16 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
           type: 'treemap',
           domain: { x: [0, 1], y: [0, 1] },
           values: [
-             showRam
-                ? bytesToGB(localCluster.TotalLocalMemory)
-                : localCluster.TotalLocalCpus
-            ,
+            showRam
+              ? bytesToGB(localCluster.TotalLocalMemory)
+              : localCluster.TotalLocalCpus,
             ...remoteClusters.flatMap(cluster => [
               showRam
                 ? bytesToGB(cluster.TotalMemoryRecived)
                 : cluster.TotalCpusRecived,
               showRam
                 ? bytesToGB(
-                    cluster.TotalMemoryRecived -
-                      cluster.TotalUsedMemoryRecived
+                    cluster.TotalMemoryRecived - cluster.TotalUsedMemoryRecived
                   )
                 : cluster.TotalCpusRecived - cluster.TotalUsedCpusRecived,
               showRam

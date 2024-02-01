@@ -33,8 +33,8 @@ export type NodeResourceMetrics = {
 export type PodResourceMetrics = {
   name: string;
   containersResources: ContainerResourceMetrics[];
-  PodTotalMemory: number;
-  PodTotalCpus: number;
+  PodtotalMemory: number;
+  PodtotalCpus: number;
 };
 
 export type ContainerResourceMetrics = {
