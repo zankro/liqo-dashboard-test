@@ -14,7 +14,7 @@ type ClusterDto struct {
 	Networking             discoveryv1alpha1.PeeringConditionStatusType `json:"networking"`
 	Authentication         discoveryv1alpha1.PeeringConditionStatusType `json:"authentication"`
 	OutgoingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"outgoingPeering"`
-	OutgoingResources      *NodeResourceMetrics                         `json:"outgoingResources"`
+	OutgoingResources      *[]NodeResourceMetrics                       `json:"outgoingResources"`
 	IncomingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"incomingPeering"`
 	IncomingResources      *[]PodResourceMetrics                        `json:"incomingResources"`
 	Age                    string                                       `json:"age,omitempty"`
@@ -33,8 +33,8 @@ type ClusterDto struct {
 // NamespaceResourceMetrics represents the metrics of a node
 type NodeResourceMetrics struct {
 	Name        string  `json:"name"`
-	TotalCpus   float64 `json:"NodetotalCpus"`
-	TotalMemory float64 `json:"NodetotalMemory"`
+	TotalCpus   float64 `json:"NodeTotalCpus"`
+	TotalMemory float64 `json:"NodeTotalMemory"`
 	Pods        *[]PodResourceMetrics
 }
 
@@ -42,14 +42,14 @@ type NodeResourceMetrics struct {
 type PodResourceMetrics struct {
 	Name                string                      `json:"name"`
 	ContainersResources *[]ContainerResourceMetrics `json:"containersResources"`
-	TotalMemory         float64                     `json:"PodtotalMemory"`
-	TotalCpus           float64                     `json:"PodtotalCpus"`
+	TotalMemory         float64                     `json:"PodTotalMemory"`
+	TotalCpus           float64                     `json:"PodTotalCpus"`
 }
 
 type ContainerResourceMetrics struct {
 	Name        string  `json:"name"`
-	TotalMemory float64 `json:"ContainertotalMemory"`
-	TotalCpus   float64 `json:"ContainertotalCpus"`
+	TotalMemory float64 `json:"ContainerTotalMemory"`
+	TotalCpus   float64 `json:"ContainerTotalCpus"`
 }
 
 // ErrorResponse is returned to the client in case of error.
@@ -62,12 +62,13 @@ func fromForeignCluster(fc *discoveryv1alpha1.ForeignCluster) *ClusterDto {
 	pc := peeringConditionsToMap(fc.Status.PeeringConditions)
 
 	clusterDto := &ClusterDto{
-		Name:            fc.Name,
-		clusterID:       fc.Spec.ClusterIdentity.ClusterID,
-		OutgoingPeering: statusOrDefault(pc, discoveryv1alpha1.OutgoingPeeringCondition),
-		IncomingPeering: statusOrDefault(pc, discoveryv1alpha1.IncomingPeeringCondition),
-		Networking:      statusOrDefault(pc, discoveryv1alpha1.NetworkStatusCondition),
-		Authentication:  statusOrDefault(pc, discoveryv1alpha1.AuthenticationStatusCondition),
+		Name:              fc.Name,
+		clusterID:         fc.Spec.ClusterIdentity.ClusterID,
+		OutgoingPeering:   statusOrDefault(pc, discoveryv1alpha1.OutgoingPeeringCondition),
+		IncomingPeering:   statusOrDefault(pc, discoveryv1alpha1.IncomingPeeringCondition),
+		Networking:        statusOrDefault(pc, discoveryv1alpha1.NetworkStatusCondition),
+		Authentication:    statusOrDefault(pc, discoveryv1alpha1.AuthenticationStatusCondition),
+		OutgoingResources: &[]NodeResourceMetrics{},
 	}
 
 	auth, found := pc[discoveryv1alpha1.AuthenticationStatusCondition]

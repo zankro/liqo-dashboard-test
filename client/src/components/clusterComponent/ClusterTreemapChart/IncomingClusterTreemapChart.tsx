@@ -10,9 +10,12 @@ interface IncomingClusterTreemapChartProps {
   showRam: boolean;
 }
 
-const IncomingClusterTreemapChart: React.FC<
-  IncomingClusterTreemapChartProps
-> = ({ remoteClusters, localCluster, showRam }) => {
+const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = ({
+  remoteClusters,
+  localCluster,
+  showRam,
+}) => {
+  console.log(remoteClusters);
   const hashString = (str: string) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {

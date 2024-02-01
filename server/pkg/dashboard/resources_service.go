@@ -10,6 +10,7 @@ import (
 	discoveryv1alpha1 "github.com/liqotech/liqo/apis/discovery/v1alpha1"
 	sharingv1alpha1 "github.com/liqotech/liqo/apis/sharing/v1alpha1"
 	liqoconsts "github.com/liqotech/liqo/pkg/consts"
+	liqoutils "github.com/liqotech/liqo/pkg/utils"
 	liqogetters "github.com/liqotech/liqo/pkg/utils/getters"
 	liqolabels "github.com/liqotech/liqo/pkg/utils/labels"
 	liqorestcfg "github.com/liqotech/liqo/pkg/utils/restcfg"
@@ -200,8 +201,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		return nil, err
 	}
 
+	// Retrieve from Local Clusters pod list of pods with ShadowPod label, i.e. list of pods offloaded to remote clusters
 	remotePodList := &corev1.PodList{}
-
 	err = cl.List(ctx, remotePodList, client.MatchingLabels{
 		liqoconsts.LocalPodLabelKey: "true",
 	})
@@ -210,6 +211,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		return nil, err
 	}
 
+	// Populates remoteNodeNamePod with the name of the node where the pod is running and namespaceMap with the namespaces of the pods
 	//map[podName]nodeName
 	remoteNodeNamePod := make(map[string]string)
 	namespaceMap := make(map[string]bool)
@@ -235,13 +237,18 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		for _, nodeName := range remoteNodeNamePod {
 			if node.Name == nodeName {
 				remoteNodeList[node.Labels["liqo.io/remote-cluster-id"]] = node.Name
-			} else {
-				//Modificare perchè ci sono tanti nodi ripetuti e anche i nodi remoti potrebbero essere presenti
-				localNodeList = append(localNodeList, node.Name)
+				break
 			}
+		}
+		if node.Labels["liqo.io/remote-cluster-id"] == "" {
+			localNodeList = append(localNodeList, node.Name)
 		}
 	}
 
+	fmt.Println("Local Nodes: ", localNodeList)
+	fmt.Println("Remote Nodes: ", remoteNodeList)
+
+	// si chiama localPodList ma in realta' prende tutti i pods, anche quelli offloaded. Mappa podName -> nodeName
 	localPodList := &corev1.PodList{}
 	err = cl.List(ctx, localPodList)
 	if err != nil {
@@ -249,6 +256,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		return nil, err
 	}
 
+	// Qua creo effettivamente la mappa podName --> nodeName
 	//map[podName]nodeName
 	localNodeNamePod := make(map[string]string)
 	for _, pod := range localPodList.Items {
@@ -268,6 +276,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	for _, pod := range podMetricsList.Items {
 		var podCpuUsage, podMemoryUsage float64
 		containerResources := []ContainerResourceMetrics{}
+
+		// Aggrego risorse usate per ogni container del pod
 		for _, cont := range pod.Containers {
 			cpuUsage := cont.Usage.Cpu().AsApproximateFloat64()
 			memoryUsage := cont.Usage.Memory().AsApproximateFloat64()
@@ -280,6 +290,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			})
 		}
 
+		// Se il pod è offloaded, aggrego e aggiungo le risorse usate al nodo remoto
 		if remoteNodeNamePod[pod.Name] != "" && pod.ObjectMeta.Labels["liqo.io/shadowPod"] != "" {
 			var remoteNode NodeResourceMetrics
 			if _, exists := virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
@@ -305,7 +316,10 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			})
 
 			virtualNodeResourceMetrics[remoteNodeNamePod[pod.Name]] = remoteNode
+
 		} else if localNodeNamePod[pod.Name] != "" && namespaceMap[pod.Namespace] {
+
+			// Se il pod è locale, aggrego e aggiungo le risorse usate al nodo locale
 			var localNode NodeResourceMetrics
 			if _, exists := localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]; exists {
 				localNode = localNodeResourceMetrics[remoteNodeNamePod[pod.Name]]
@@ -315,8 +329,10 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 				localNode.TotalCpus = 0
 				localNode.TotalMemory = 0
 			}
+
 			localNode.TotalCpus += podCpuUsage
 			localNode.TotalMemory += podMemoryUsage
+
 			if localNode.Pods == nil {
 				localNode.Pods = &[]PodResourceMetrics{}
 			}
@@ -326,24 +342,31 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 				TotalMemory:         podMemoryUsage,
 				TotalCpus:           podCpuUsage,
 			})
+
 			localNodeResourceMetrics[localNodeNamePod[pod.Name]] = localNode
 		}
 	}
 
 	var ClusterDtoArray []ClusterDto
 
+	// Per ogni foreign cluster creo un ClusterDto e controllo se è in peering Outgoing.
+	// In tal caso aggiungo le risorse outgoing calcolate precedentemente
 	for i := range foreignClusterList.Items {
 		clusterDto := fromForeignCluster(&foreignClusterList.Items[i])
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
 			klog.V(5).Infof("Calculating outgoing resources for cluster %s", clusterDto.clusterID)
 			outgoingResources := virtualNodeResourceMetrics[remoteNodeList[clusterDto.clusterID]]
-			clusterDto.OutgoingResources = nil
+			fmt.Println("Outgoing resources: ", outgoingResources, "i", i)
+			*clusterDto.OutgoingResources = append(*clusterDto.OutgoingResources, outgoingResources)
+			fmt.Println("Outgoing resources: ", clusterDto.OutgoingResources)
 			clusterDto.IncomingResources = nil
 			clusterDto.TotalUsedCpusRecived = outgoingResources.TotalCpus
 			clusterDto.TotalUsedMemoryRecived = outgoingResources.TotalMemory
 			clusterDto.LocalResources = nil
 		}
 		ClusterDtoArray = append(ClusterDtoArray, *clusterDto)
+		fmt.Println("Outgoing resources: ", clusterDto.OutgoingResources, clusterDto.Name)
+
 	}
 
 	incomingClusterResources := make(map[string][]PodResourceMetrics)
@@ -352,6 +375,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 
 	incomingPodMetricsList := []metricsv1beta1.PodMetricsList{}
 
+	// Per ogni foreign cluster recupero le metriche dei pods con label virtualkubelet.liqo.io/origin=clusterID e le aggiungo alla lista incomingPodMetricsList
+	// clusterID è l'ID del foreign cluster
 	for _, actualCluster := range ClusterDtoArray {
 		podMetricsList := &metricsv1beta1.PodMetricsList{}
 		clusterID := actualCluster.clusterID
@@ -363,8 +388,10 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		incomingPodMetricsList = append(incomingPodMetricsList, *podMetricsList)
 	}
 
+	// Per ogni pod della lista incomingPodMetricsList calcolo le risorse usate e le aggiungo alla lista incomingPodResources
 	for _, pod := range incomingPodMetricsList {
 		for _, podMetrics := range pod.Items {
+
 			var podCpuUsage, podMemoryUsage float64
 			containerResources := []ContainerResourceMetrics{}
 			for _, cont := range podMetrics.Containers {
@@ -378,6 +405,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 					TotalMemory: memoryUsage,
 				})
 			}
+
+			// Aggrego le risorse usate per ogni pod con stesso clusterID di origine
 			var incomingPod PodResourceMetrics
 			if _, exists := incomingPodResources[incomingPod.Name]; exists {
 				incomingPod = incomingPodResources[podMetrics.Name]
@@ -387,8 +416,10 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 				incomingPod.TotalCpus = 0
 				incomingPod.TotalMemory = 0
 			}
+
 			incomingPod.TotalCpus += podCpuUsage
 			incomingPod.TotalMemory += podMemoryUsage
+
 			if incomingPod.ContainersResources == nil {
 				incomingPod.ContainersResources = &[]ContainerResourceMetrics{}
 			}
@@ -401,6 +432,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			if incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] == nil {
 				incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] = []PodResourceMetrics{}
 			}
+
 			incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]] = append(incomingClusterResources[podMetrics.Labels["virtualkubelet.liqo.io/origin"]], incomingPod)
 		}
 	}
@@ -428,6 +460,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		}
 	}
 
+	// Per ogni foreign cluster calcolo le risorse totali ricevute e offerte
 	for i := range ClusterDtoArray {
 		if isPeeringEstablished(ClusterDtoArray[i].OutgoingPeering) {
 			clusterNode := &corev1.NodeList{}
@@ -454,11 +487,18 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	}
 
 	var localCluster ClusterDto
-	localCluster.Name = "Local Cluster"
-	localCluster.clusterID = "local"
+
+	clusterIdentity, err := liqoutils.GetClusterIdentityWithControllerClient(ctx, cl, metav1.NamespaceAll)
+	if err != nil {
+		klog.Warningf("error retrieving local cluster identity: %s", err)
+		return nil, err
+	}
+	localCluster.Name = clusterIdentity.ClusterName
+	localCluster.clusterID = clusterIdentity.ClusterID
 
 	for _, clusterDto := range ClusterDtoArray {
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
+			localCluster.OutgoingPeering = discoveryv1alpha1.PeeringConditionStatusEstablished
 			localCluster.TotalUsedCpusRecived += clusterDto.TotalUsedCpusRecived
 			localCluster.TotalUsedMemoryRecived += clusterDto.TotalUsedMemoryRecived
 			localCluster.TotalCpusRecived += clusterDto.TotalCpusRecived
@@ -466,6 +506,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		}
 
 		if isPeeringEstablished(clusterDto.IncomingPeering) {
+			localCluster.IncomingPeering = discoveryv1alpha1.PeeringConditionStatusEstablished
 			localCluster.TotalUsedCpusOffered += clusterDto.TotalUsedCpusOffered
 			localCluster.TotalUsedMemoryOffered += clusterDto.TotalUsedMemoryOffered
 			localCluster.TotalMemoryOffered += clusterDto.TotalMemoryOffered
