@@ -7,11 +7,13 @@ import * as d3 from 'd3';
 interface RemoteClusterTreemapChart {
   cluster: ForeignCluster;
   showRam: boolean;
+  color: string;
 }
 
 function RemoteClusterTreemapChart({
   cluster,
   showRam,
+  color
 }: RemoteClusterTreemapChart) {
   function hashString(str: String) {
     let hash = 0;
@@ -30,7 +32,12 @@ function RemoteClusterTreemapChart({
     const darker = d3.hsl(color).darker(ratio);
     return darker.toString();
   }
-  const clusterColor = hashColor(cluster.name);
+  const clusterColor = color;
+
+console.log(clusterColor);
+
+
+
   const values = [
     showRam ? bytesToGB(cluster.TotalMemoryRecived) : cluster.TotalCpusRecived,
     showRam ? bytesToGB(cluster.TotalMemoryRecived) : cluster.TotalCpusRecived,
