@@ -44,6 +44,7 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                 <Xarrow
                   endAnchor="top"
                   showTail={true}
+                  showHead={false}
                   start={localCluster.name}
                   key={"incomingArrow"}
                   end={`incoming`}

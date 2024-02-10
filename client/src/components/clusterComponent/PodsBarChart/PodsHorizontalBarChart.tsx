@@ -33,7 +33,7 @@ const darkenColor = (color: string, ratio: number) => {
 
 const PodsHorizontalBarChart: React.FC<Props> = ({ cluster, showRam }) => {
   const xData = cluster.incomingResources.map((pod: PodResourceMetrics) =>
-    showRam ? bytesToGB(pod.PodtotalMemory * 1024) : pod.PodtotalCpus
+    showRam ? bytesToGB(pod.PodTotalMemory * 1024) : pod.PodTotalCpus
   );
 
   console.log(cluster.incomingResources, xData);

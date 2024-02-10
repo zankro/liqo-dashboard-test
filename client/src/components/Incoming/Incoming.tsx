@@ -17,7 +17,12 @@ function Incoming(props: IClusterList) {
     c => c.incomingPeering == 'Established'
   );
   if (clusters.local.length > 0) {
+    if(incomingClusters.length == 0){
+      return <div> No incoming clusters </div>;
+    }
     console.log(clusters.remote[0].incomingResources[0]);
+    console.log("Incoming clusters");
+    console.log(incomingClusters);
     return (
       <Container>
         <Container className="center">

@@ -91,3 +91,12 @@ a{
     color: none!important;
     font-size:large;
 }
+
+.react-toggle--checked .react-toggle-track {
+    background-color: #395cb3;
+    
+}
+
+.react-toggle--checked > *:not(.react-toggle-thumb) {
+    background-color: #395cb3 !important   
+}
