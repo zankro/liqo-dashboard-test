@@ -26,6 +26,7 @@ function Incoming(props: IClusterList) {
     return (
       <Container>
         <Container className="center">
+        <h2>Cluster che ricevono risorse </h2>
           <IncomingClusterTreemapChart
             remoteClusters={incomingClusters}
             localCluster={localCluster}

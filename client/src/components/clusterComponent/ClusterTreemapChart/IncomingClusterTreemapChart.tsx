@@ -72,18 +72,20 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
           colorCounts[color] = (colorCounts[color] || 0) + 1;
       });
 
-      const duplicates = findDuplicates(colorsArray);
-      duplicates.forEach(duplicate => {
-          const index = colorsArray.indexOf(duplicate);
-          colorsArray[index] = changeColor(duplicate, offset);
-      });
+      while(findDuplicates(colorsArray).length > 0) {
+          const duplicates = findDuplicates(colorsArray);
+          duplicates.forEach(duplicate => {
+              const index = colorsArray.indexOf(duplicate);
+              colorsArray[index] = changeColor(duplicate, offset);
+          });
 
-      return colorsArray;
+          return colorsArray;
+      }
   };
 
   const changeColor = (color: string, offset: number) => {
     const hsl = d3.hsl(color);
-    hsl.h += offset;
+    hsl.h += offset * 2;
     return hsl.toString();
   };
 
@@ -159,6 +161,7 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
         },
       ]}
       layout={{
+        title:localCluster.name,
         autosize: true,
       }}
     />

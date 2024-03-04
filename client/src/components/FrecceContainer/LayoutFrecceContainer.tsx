@@ -21,6 +21,10 @@ function LayoutFrecceContainer(props : LayoutFrecceContainerProps) {
         }}
         >
         <Container>
+          <Container className="center"> 
+            <h2>Stato dei collegamenti</h2>
+
+          </Container>
           <Row className="align-items-center mb-2">
             <Col
               xs="auto"

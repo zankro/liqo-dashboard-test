@@ -5,16 +5,22 @@ import './ClusterTreemapChart.css';
 import * as d3 from 'd3';
 import { ListFormat } from 'typescript';
 
+interface colorMap {
+  [key: string]: string;
+}
+
 interface LocalClusterTreemapChart {
   remoteClusters: ForeignCluster[];
   localCluster: ForeignCluster;
   showRam: boolean;
+  clusterColors: colorMap;
 }
 
 function LocalClusterTreemapChart({
   remoteClusters,
   localCluster,
   showRam,
+  clusterColors
 }: LocalClusterTreemapChart) {
   function hashString(str: String) {
     let hash = 0;
@@ -37,7 +43,7 @@ function LocalClusterTreemapChart({
   const colors = [
     'white',
     ...remoteClusters.flatMap(cluster => {
-      const clusterColor = hashColor(cluster.name);
+      const clusterColor = clusterColors[cluster.name];
       return [
         clusterColor,
         darkenColor(clusterColor, 1),

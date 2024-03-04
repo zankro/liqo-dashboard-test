@@ -22,11 +22,13 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
         color: 'black',
       }}
     >
+      
       <Xwrapper>
         <Container className='d-flex flex-column justify-content-between'>
             <div style={{
     paddingBottom: '100px',
   }}>
+    
                   <ClusterBubbleChart cluster={localCluster} showRam={showRam}/>            
             </div>
 
