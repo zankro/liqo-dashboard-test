@@ -182,7 +182,7 @@ const fakeResponse = [
         "TotalLocalMemoryUsed": 12455936,
       },
       {
-        "name": "ClusterOutgoing",
+        "name": "ciao",
         "networking": "Established",
         "authentication": "Established",
         "outgoingPeering": "Established",
