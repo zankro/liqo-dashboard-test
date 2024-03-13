@@ -17,9 +17,7 @@ export interface IClusterList {
 function LiqoNavTabs(props: IClusterList) {
   const { clusters, refs, showRam } = props;
   const localCluster = clusters.local[0];
-  return (
-<div></div>
-  );
+  return <div></div>;
 }
 
 export default LiqoNavTabs;

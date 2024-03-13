@@ -70,16 +70,17 @@ function LiqoNavbar(props: ILiqoNavbar) {
           </label>
         </Container>
         <Container className="customTab">
-          <Link
-            to="/offloading"
-            className="navTabs"
-          >
-            <label style={{
-              color:
-                location.pathname === '/offloading'
-                  ? '#395cb3'
-                  : 'rgba(255,255,255,0.5)',
-            }} >Offloading</label>
+          <Link to="/offloading" className="navTabs">
+            <label
+              style={{
+                color:
+                  location.pathname === '/offloading'
+                    ? '#395cb3'
+                    : 'rgba(255,255,255,0.5)',
+              }}
+            >
+              Offloading
+            </label>
           </Link>
           <Link
             to="/"

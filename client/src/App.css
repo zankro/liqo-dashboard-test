@@ -20,7 +20,7 @@
 
 .myTabs {
   padding-right: 0 !important;
-  padding-left: 0  !important;
+  padding-left: 0 !important;
 }
 
 .prevent-select {
@@ -28,7 +28,6 @@
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
-
 
 ::-webkit-scrollbar {
   width: 10px; /* width of the entire scrollbar */
@@ -42,7 +41,6 @@
 ::-webkit-scrollbar-thumb {
   background: #888; /* color of the scroll thumb */
   border-radius: 10px;
-  
 }
 
 ::-webkit-scrollbar-thumb:hover {

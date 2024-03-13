@@ -10,22 +10,25 @@ interface ClusterBoxProps {
   showRam: boolean;
 }
 
-const ClusterBox: React.FC<ClusterBoxProps> = ({
-  id,
-  clusters,
-  showRam,
-}) => {
-
+const ClusterBox: React.FC<ClusterBoxProps> = ({ id, clusters, showRam }) => {
   const index = parseInt(id.substring(4));
 
-  return (  
-      <div className="arrow-box " id={id}  style={{
-              paddingBottom: '40px',
-            }}>
-            {clusters.map((cluster) => 
-                <ClusterBubbleChart cluster={cluster} showRam={showRam} key={cluster.name}/>            
-            )}
-      </div>
+  return (
+    <div
+      className="arrow-box "
+      id={id}
+      style={{
+        paddingBottom: '40px',
+      }}
+    >
+      {clusters.map(cluster => (
+        <ClusterBubbleChart
+          cluster={cluster}
+          showRam={showRam}
+          key={cluster.name}
+        />
+      ))}
+    </div>
   );
 };
 

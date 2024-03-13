@@ -22,80 +22,111 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
         color: 'black',
       }}
     >
-      
       <Xwrapper>
-        <Container className='d-flex flex-column justify-content-between'>
-            <div style={{
-    paddingBottom: '100px',
-  }}>
-    
-                  <ClusterBubbleChart cluster={localCluster} showRam={showRam}/>            
-            </div>
+        <Container className="d-flex flex-column justify-content-between">
+          <div
+            style={{
+              paddingBottom: '100px',
+            }}
+          >
+            <ClusterBubbleChart cluster={localCluster} showRam={showRam} />
+          </div>
 
-            <Container className="d-flex flex-row justify-content-between" >
-                {remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering !== "Established").length > 0 ? <>
-                  <Card className="incoming">
-                  <ClusterBox 
-                    clusters={remoteClusters.filter(cluster => cluster.incomingPeering === 'Established'  && cluster.outgoingPeering !== "Established")}
+          <Container className="d-flex flex-row justify-content-between">
+            {remoteClusters.filter(
+              cluster =>
+                cluster.incomingPeering === 'Established' &&
+                cluster.outgoingPeering !== 'Established'
+            ).length > 0 ? (
+              <>
+                <Card className="incoming">
+                  <ClusterBox
+                    clusters={remoteClusters.filter(
+                      cluster =>
+                        cluster.incomingPeering === 'Established' &&
+                        cluster.outgoingPeering !== 'Established'
+                    )}
                     id={`incoming`}
-                    key={"incoming"}
+                    key={'incoming'}
                     showRam={showRam}
                   />
-              </Card>
-            
+                </Card>
+
                 <Xarrow
                   endAnchor="top"
                   showTail={true}
                   showHead={false}
                   start={localCluster.name}
-                  key={"incomingArrow"}
+                  key={'incomingArrow'}
                   end={`incoming`}
                 />
-                </>: "" }
+              </>
+            ) : (
+              ''
+            )}
 
-                {remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering === "Established").length > 0 ?
-                <>
-                            
+            {remoteClusters.filter(
+              cluster =>
+                cluster.incomingPeering === 'Established' &&
+                cluster.outgoingPeering === 'Established'
+            ).length > 0 ? (
+              <>
                 <Card className="both">
-                    <ClusterBox
-                      clusters={remoteClusters.filter(cluster => cluster.incomingPeering === 'Established' && cluster.outgoingPeering === "Established") }
-                      id={`both`}
-                      key={"both"}
-                      showRam={showRam}
-                    />
+                  <ClusterBox
+                    clusters={remoteClusters.filter(
+                      cluster =>
+                        cluster.incomingPeering === 'Established' &&
+                        cluster.outgoingPeering === 'Established'
+                    )}
+                    id={`both`}
+                    key={'both'}
+                    showRam={showRam}
+                  />
                 </Card>
                 <Xarrow
                   endAnchor="top"
                   showTail={true}
                   showHead={true}
                   start={localCluster.name}
-                  key={"bothArrow"}
+                  key={'bothArrow'}
                   end={`both`}
                 />
-                </> : "" }
+              </>
+            ) : (
+              ''
+            )}
 
-                {remoteClusters.filter(cluster => cluster.outgoingPeering == 'Established'  && cluster.incomingPeering !== "Established").length > 0 ?             
-                <>
-                <Card className='outgoing'>
-                    <ClusterBox
-                      clusters={remoteClusters.filter(cluster => cluster.outgoingPeering === 'Established' && cluster.incomingPeering !== "Established")}
-                      id={`outgoing`}
-                      key={`outgoing`}
-                      showRam={showRam}
-                    />
+            {remoteClusters.filter(
+              cluster =>
+                cluster.outgoingPeering == 'Established' &&
+                cluster.incomingPeering !== 'Established'
+            ).length > 0 ? (
+              <>
+                <Card className="outgoing">
+                  <ClusterBox
+                    clusters={remoteClusters.filter(
+                      cluster =>
+                        cluster.outgoingPeering === 'Established' &&
+                        cluster.incomingPeering !== 'Established'
+                    )}
+                    id={`outgoing`}
+                    key={`outgoing`}
+                    showRam={showRam}
+                  />
                 </Card>
                 <Xarrow
                   endAnchor="top"
                   showHead={true}
                   start={localCluster.name}
-                  key={"outgoingArrow"}
+                  key={'outgoingArrow'}
                   end={`outgoing`}
-                /> 
-                </>: ""}
-
-                
-              </Container>
-            </Container>
+                />
+              </>
+            ) : (
+              ''
+            )}
+          </Container>
+        </Container>
       </Xwrapper>
     </Container>
   );

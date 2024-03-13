@@ -17,16 +17,20 @@ function Incoming(props: IClusterList) {
     c => c.incomingPeering == 'Established'
   );
   if (clusters.local.length > 0) {
-    if(incomingClusters.length == 0){
-      return <div> No incoming clusters </div>;
+    if (incomingClusters.length == 0) {
+      return (
+        <Container className="center">
+          <h2> No incoming clusters </h2>
+        </Container>
+      )
     }
     console.log(clusters.remote[0].incomingResources[0]);
-    console.log("Incoming clusters");
+    console.log('Incoming clusters');
     console.log(incomingClusters);
     return (
       <Container>
         <Container className="center">
-        <h2>Cluster che ricevono risorse </h2>
+          <h2>Cluster che ricevono risorse </h2>
           <IncomingClusterTreemapChart
             remoteClusters={incomingClusters}
             localCluster={localCluster}

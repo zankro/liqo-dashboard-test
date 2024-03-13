@@ -1,4 +1,4 @@
-package dashboard
+package utils
 
 import (
 	"context"
@@ -46,7 +46,7 @@ func foreignClusters(ctx context.Context, cl client.Client) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			err := json.NewEncoder(w).Encode(ErrorResponse{
-				Message: "An error occurred during retrieving foreign clusters and metrics",
+				Message: "An error occurred during retrieving of foreign clusters and metrics",
 				Status:  http.StatusInternalServerError,
 			})
 			if err != nil {

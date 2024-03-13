@@ -1,9 +1,9 @@
 .arrow-box {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
 .arrow-box > * {
-    flex: 0 0 50%;
+  flex: 0 0 50%;
 }

@@ -5,6 +5,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Running the code
 
 The client is a standard react application, so you can run it simple using
+
 ```bash
 npm start
 ```

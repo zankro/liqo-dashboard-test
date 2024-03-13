@@ -20,7 +20,7 @@ function LocalClusterTreemapChart({
   remoteClusters,
   localCluster,
   showRam,
-  clusterColors
+  clusterColors,
 }: LocalClusterTreemapChart) {
   function hashString(str: String) {
     let hash = 0;
@@ -55,35 +55,36 @@ function LocalClusterTreemapChart({
     darkenColor(localClusterColor, 4),
   ];
 
-  const findDuplicates = (arr:string[]) => arr.filter((item:string, index:number) => arr.indexOf(item) !== index);
+  const findDuplicates = (arr: string[]) =>
+    arr.filter((item: string, index: number) => arr.indexOf(item) !== index);
 
-  const modifyDuplicateColors = (colorsArray:string[], offset:number) => {
+  const modifyDuplicateColors = (colorsArray: string[], offset: number) => {
+    type colorMap = {
+      color: number;
+    };
+
+    const colorCounts: colorMap = {
+      color: 0,
+    };
+    colorsArray.forEach(color => {
       type colorMap = {
-        color: number;
-      }
-    
-      const colorCounts:colorMap = {
-        color: 0
+        [key: string]: number;
       };
-      colorsArray.forEach(color => {
-          type colorMap = {
-            [key: string]: number;
-          }
 
-          const colorCounts: colorMap = {
-            color: 0
-          };
+      const colorCounts: colorMap = {
+        color: 0,
+      };
 
-          colorCounts[color] = (colorCounts[color] || 0) + 1;
-      });
+      colorCounts[color] = (colorCounts[color] || 0) + 1;
+    });
 
-      const duplicates = findDuplicates(colorsArray);
-      duplicates.forEach(duplicate => {
-          const index = colorsArray.indexOf(duplicate);
-          colorsArray[index] = changeColor(duplicate, offset);
-      });
+    const duplicates = findDuplicates(colorsArray);
+    duplicates.forEach(duplicate => {
+      const index = colorsArray.indexOf(duplicate);
+      colorsArray[index] = changeColor(duplicate, offset);
+    });
 
-      return colorsArray;
+    return colorsArray;
   };
 
   const changeColor = (color: string, offset: number) => {
@@ -123,7 +124,7 @@ function LocalClusterTreemapChart({
               'Local Resources',
               'Local Resources',
             ],
-            branchvalues: "total",
+            branchvalues: 'total',
             type: 'treemap',
             domain: { x: [0, 1], y: [0, 1], column: 10, row: 10 },
             values: [
@@ -159,7 +160,7 @@ function LocalClusterTreemapChart({
                     localCluster.TotalLocalMemory -
                       localCluster.TotalUsedLocalMemory
                   )
-                : localCluster.TotalLocalCpus-localCluster.TotalUsedLocalCpus,
+                : localCluster.TotalLocalCpus - localCluster.TotalUsedLocalCpus,
               showRam
                 ? bytesToGB(localCluster.TotalUsedLocalMemory)
                 : localCluster.TotalUsedLocalCpus,
@@ -169,7 +170,7 @@ function LocalClusterTreemapChart({
           },
         ]}
         layout={{
-          title:localCluster.name,
+          title: localCluster.name,
           autosize: true,
         }}
       />

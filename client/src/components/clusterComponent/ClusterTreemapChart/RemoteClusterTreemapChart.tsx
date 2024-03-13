@@ -13,7 +13,7 @@ interface RemoteClusterTreemapChart {
 function RemoteClusterTreemapChart({
   cluster,
   showRam,
-  color
+  color,
 }: RemoteClusterTreemapChart) {
   function hashString(str: String) {
     let hash = 0;
@@ -34,9 +34,7 @@ function RemoteClusterTreemapChart({
   }
   const clusterColor = color;
 
-console.log(clusterColor);
-
-
+  console.log(clusterColor);
 
   const values = [
     showRam ? bytesToGB(cluster.TotalMemoryRecived) : cluster.TotalCpusRecived,

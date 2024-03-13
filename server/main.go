@@ -7,7 +7,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 
-	"liqo_dashboard/pkg/dashboard"
+	"dashboard_backend/utils"
 )
 
 func main() {
@@ -15,8 +15,8 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	cl, err := dashboard.GetKClient(ctx)
+	cl, err := utils.GetKClient(ctx)
 	utilruntime.Must(err)
 
-	klog.Fatalf("unable to start the server: %s", dashboard.SetupRouterAndServeHTTP(ctx, cl))
+	klog.Fatalf("unable to start the server: %s", utils.SetupRouterAndServeHTTP(ctx, cl))
 }

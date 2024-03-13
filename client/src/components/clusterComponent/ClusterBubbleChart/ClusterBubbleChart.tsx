@@ -60,11 +60,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
       </p>
     );
   }
-  hoverText.push(
-    <p key="latency">
-      {`Latency: ${cluster.Latency.value}`}
-    </p>
-  );
+  hoverText.push(<p key="latency">{`Latency: ${cluster.Latency.value}`}</p>);
 
   return (
     <Container>

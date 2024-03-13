@@ -24,10 +24,12 @@ function App() {
 
   const fetchAndSetCluster = useCallback(() => {
     API.getPeerings().then(fetchedClusters => {
-      fetchedClusters.local[0].name = capitalizeFirstLetter(fetchedClusters.local[0].name)
+      fetchedClusters.local[0].name = capitalizeFirstLetter(
+        fetchedClusters.local[0].name
+      );
       fetchedClusters.remote.forEach(cluster => {
-        cluster.name = capitalizeFirstLetter(cluster.name)
-      }) 
+        cluster.name = capitalizeFirstLetter(cluster.name);
+      });
       setClusters(fetchedClusters);
       if (Object.keys(fetchedClusters).length > 0) {
         if (!currentCluster) {
@@ -69,39 +71,44 @@ function App() {
     window.addEventListener('scroll', onScroll);
   }, [currentCluster, clusters]);
 
-
   return (
     <BrowserRouter>
       <AnimatePresence mode="wait">
         <Routes>
+          <Route
+            path="/"
+            element={
+              <DefaultLayout
+                loading={isLoading}
+                showRam={showRam}
+                setShowRam={setShowRam}
+              />
+            }
+          >
             <Route
               path="/"
               element={
-                <DefaultLayout loading= {isLoading} showRam={showRam} setShowRam={setShowRam} />
+                <LayoutFrecceContainer
+                  clusters={clusters}
+                  showRam={showRam}
+                  refs={refs}
+                />
               }
-            >
-              <Route
-            path="/"
-            element={
-              <LayoutFrecceContainer
-                clusters={clusters}
-                showRam={showRam}
-                refs={refs}
-              />
-            }
-          />
-          <Route
-            path="Offloading"
-            element={
-              <Offloading showRam={showRam} clusters={clusters} refs={refs} />
-            }
-          />
-          <Route
-            path="Incoming"
-            element={<Incoming showRam={showRam} clusters={clusters} refs={refs} />}
-          />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
+            />
+            <Route
+              path="Offloading"
+              element={
+                <Offloading showRam={showRam} clusters={clusters} refs={refs} />
+              }
+            />
+            <Route
+              path="Incoming"
+              element={
+                <Incoming showRam={showRam} clusters={clusters} refs={refs} />
+              }
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
         </Routes>
       </AnimatePresence>
     </BrowserRouter>

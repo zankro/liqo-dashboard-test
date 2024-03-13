@@ -10,11 +10,9 @@ interface IncomingClusterTreemapChartProps {
   showRam: boolean;
 }
 
-const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = ({
-  remoteClusters,
-  localCluster,
-  showRam,
-}) => {
+const IncomingClusterTreemapChart: React.FC<
+  IncomingClusterTreemapChartProps
+> = ({ remoteClusters, localCluster, showRam }) => {
   console.log(remoteClusters);
   const hashString = (str: string) => {
     let hash = 0;
@@ -50,37 +48,38 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
   ];
   console.log(colors);
 
-  const findDuplicates = (arr:string[]) => arr.filter((item:string, index:number) => arr.indexOf(item) !== index);
+  const findDuplicates = (arr: string[]) =>
+    arr.filter((item: string, index: number) => arr.indexOf(item) !== index);
 
-  const modifyDuplicateColors = (colorsArray:string[], offset:number) => {
+  const modifyDuplicateColors = (colorsArray: string[], offset: number) => {
+    type colorMap = {
+      color: number;
+    };
+
+    const colorCounts: colorMap = {
+      color: 0,
+    };
+    colorsArray.forEach(color => {
       type colorMap = {
-        color: number;
-      }
-    
-      const colorCounts:colorMap = {
-        color: 0
+        [key: string]: number;
       };
-      colorsArray.forEach(color => {
-          type colorMap = {
-            [key: string]: number;
-          }
 
-          const colorCounts: colorMap = {
-            color: 0
-          };
+      const colorCounts: colorMap = {
+        color: 0,
+      };
 
-          colorCounts[color] = (colorCounts[color] || 0) + 1;
+      colorCounts[color] = (colorCounts[color] || 0) + 1;
+    });
+
+    while (findDuplicates(colorsArray).length > 0) {
+      const duplicates = findDuplicates(colorsArray);
+      duplicates.forEach(duplicate => {
+        const index = colorsArray.indexOf(duplicate);
+        colorsArray[index] = changeColor(duplicate, offset);
       });
 
-      while(findDuplicates(colorsArray).length > 0) {
-          const duplicates = findDuplicates(colorsArray);
-          duplicates.forEach(duplicate => {
-              const index = colorsArray.indexOf(duplicate);
-              colorsArray[index] = changeColor(duplicate, offset);
-          });
-
-          return colorsArray;
-      }
+      return colorsArray;
+    }
   };
 
   const changeColor = (color: string, offset: number) => {
@@ -91,8 +90,6 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
 
   const modifiedColors = modifyDuplicateColors(colors, 30);
 
-
-
   const values = [
     showRam
       ? bytesToGB(localCluster.TotalLocalMemory)
@@ -102,9 +99,7 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
         ? bytesToGB(cluster.TotalMemoryOffered)
         : cluster.TotalCpusOffered,
       showRam
-        ? bytesToGB(
-            cluster.TotalMemoryOffered - cluster.TotalUsedMemoryOffered
-          )
+        ? bytesToGB(cluster.TotalMemoryOffered - cluster.TotalUsedMemoryOffered)
         : cluster.TotalCpusOffered - cluster.TotalUsedCpusOffered,
       showRam
         ? bytesToGB(cluster.TotalUsedMemoryOffered)
@@ -161,7 +156,7 @@ const IncomingClusterTreemapChart: React.FC<IncomingClusterTreemapChartProps> = 
         },
       ]}
       layout={{
-        title:localCluster.name,
+        title: localCluster.name,
         autosize: true,
       }}
     />
