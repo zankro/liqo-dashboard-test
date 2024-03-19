@@ -235,8 +235,11 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 
 	ClustersInfo := make(map[string][]ClusterDto)
 
+	localResourcesAggregates(ctx, cl, &localCluster)
+
 	ClustersInfo["local"] = []ClusterDto{localCluster}
 	ClustersInfo["remote"] = ClusterDtoArray
+
 	return ClustersInfo, nil
 }
 
@@ -402,4 +405,51 @@ func incomingAggregates(ptrArray *[]ClusterDto, incomingPodMetricsList *[]metric
 			ClusterDtoArray[i].TotalUsedMemoryOffered += pod.TotalMemory
 		}
 	}
+}
+
+func localResourcesAggregates(ctx context.Context, cl client.Client, clusterdata *ClusterDto) {
+
+	clusterCPU := 0.0
+	clusterMemory := 0.0
+	clusterUsedCPU := 0.0
+	clusterUsedMemory := 0.0
+
+	//localClusterResources := &LocalClusterResourcesMetrics{}
+	//localNodes := &metricsv1beta1.NodeMetricsList{}
+	localNodes := &corev1.NodeList{}
+
+	err := cl.List(ctx, localNodes)
+	if err != nil {
+		klog.Errorf("error retrieving local pods: %s", err)
+		return
+	}
+
+	fmt.Println(localNodes.Items)
+
+	for _, node := range localNodes.Items {
+		if _, exists := node.Labels["liqo.io/remote-cluster-id"]; !exists {
+			clusterCPU += node.Status.Capacity.Cpu().AsApproximateFloat64()
+			clusterMemory += node.Status.Capacity.Memory().AsApproximateFloat64()
+		}
+	}
+
+	for _, localnode := range *clusterdata.LocalResources {
+		clusterUsedCPU += localnode.TotalCpus
+		clusterUsedMemory += localnode.TotalMemory
+	}
+
+	fmt.Println("Cluster CPU: ", clusterCPU)
+	fmt.Println("Cluster Memory: ", clusterMemory)
+	fmt.Println("Cluster Used CPU: ", clusterUsedCPU)
+	fmt.Println("Cluster Used Memory: ", clusterUsedMemory)
+
+	clusterdata.ClusterCPU = clusterCPU
+	clusterdata.ClusterMemory = clusterMemory
+	clusterdata.ClusterCpuUsage = clusterUsedCPU
+	clusterdata.ClusterMemoryUsage = clusterUsedMemory
+
+	/*for i := range *localNodeResourceMetrics {
+		localNodeResources = append(localNodeResources, (*localNodeResourceMetrics)[i])
+	}*/
+
 }

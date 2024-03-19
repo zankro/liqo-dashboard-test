@@ -26,8 +26,19 @@ type ClusterDto struct {
 	TotalUsedCpusRecived   float64                                      `json:"TotalUsedCpusRecived"`
 	TotalMemoryRecived     float64                                      `json:"TotalMemoryRecived"`
 	TotalCpusRecived       float64                                      `json:"TotalCpusRecived"`
+	ClusterCPU             float64                                      `json:"clusterCPU"`
+	ClusterMemory          float64                                      `json:"clusterMemory"`
+	ClusterCpuUsage        float64                                      `json:"clusterCpuUsage"`
+	ClusterMemoryUsage     float64                                      `json:"clusterMemoryUsage"`
 	Latency                net.ConnectionLatency                        `json:"Latency"`
 	LocalResources         *[]NodeResourceMetrics                       `json:"localResources"`
+}
+
+type LocalClusterResourcesMetrics struct {
+	TotalCpus   float64 `json:"TotalCpus"`
+	TotalMemory float64 `json:"TotalMemory"`
+	UsedCpus    float64 `json:"UsedCpus"`
+	UsedMemory  float64 `json:"UsedMemory"`
 }
 
 // NamespaceResourceMetrics represents the metrics of a node
