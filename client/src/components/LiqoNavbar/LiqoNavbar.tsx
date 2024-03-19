@@ -1,7 +1,6 @@
-import { Container, Navbar, Button } from 'react-bootstrap';
+import { Container, Navbar, Dropdown } from 'react-bootstrap';
 import Logo from '../../images/logo.svg';
 import ReactGA from 'react-ga';
-import Toggle from 'react-toggle';
 import 'react-toggle/style.css'; // for ES6 modules
 import { FiCpu } from 'react-icons/fi';
 import { CgSmartphoneRam } from 'react-icons/cg';
@@ -10,17 +9,19 @@ import { Link, useLocation } from 'react-router-dom';
 const win = window as any;
 
 export interface ILiqoNavbar {
-  showRam: Boolean;
-  setShowRam: Function;
+  metric: String;
+  setMetric: Function;
 }
 
 function LiqoNavbar(props: ILiqoNavbar) {
-  const { showRam, setShowRam } = props;
+  const { metric, setMetric } = props;
   const location = useLocation();
   if (win._env_ && win._env_.GOOGLE_ANALYTICS_TRACKING_ID) {
     ReactGA.initialize((window as any)._env_.GOOGLE_ANALYTICS_TRACKING_ID);
     ReactGA.pageview(win.location.pathname);
   }
+
+  const handleSelect = (eventKey: any) => setMetric(eventKey);
 
   return (
     <Navbar bg="dark" variant="dark">
@@ -51,22 +52,38 @@ function LiqoNavbar(props: ILiqoNavbar) {
             Public peering dashboard
           </Navbar.Brand>
           <label className="d-flex flex-row justify-content-between align-items-center">
-            <span
-              style={{
-                color: 'white',
-              }}
+            <Dropdown
+              className="custom-dropdown-container"
+              onSelect={handleSelect}
             >
-              {showRam ? 'Mostra CPU' : 'Mostra RAM'}
-            </span>
-            <Toggle
-              checked={Boolean(showRam)}
-              className="custom-toggle"
-              icons={{
-                checked: <CgSmartphoneRam />,
-                unchecked: <FiCpu />,
-              }}
-              onChange={() => setShowRam((oldValue: boolean) => !oldValue)}
-            />
+              <Dropdown.Toggle className="custom-dropdown" id="dropdown-basic">
+                {metric}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {metric !== 'Ram' ? (
+                  <Dropdown.Item className="custom-dropdown" eventKey="Ram">
+                    Ram
+                  </Dropdown.Item>
+                ) : (
+                  ''
+                )}
+                {metric !== 'CPU' ? (
+                  <Dropdown.Item className="custom-dropdown" eventKey="CPU">
+                    CPU
+                  </Dropdown.Item>
+                ) : (
+                  ''
+                )}
+                {metric !== 'GPU' ? (
+                  <Dropdown.Item className="custom-dropdown" eventKey="GPU">
+                    GPU
+                  </Dropdown.Item>
+                ) : (
+                  ''
+                )}
+              </Dropdown.Menu>
+            </Dropdown>
           </label>
         </Container>
         <Container className="customTab">
@@ -77,6 +94,7 @@ function LiqoNavbar(props: ILiqoNavbar) {
                   location.pathname === '/offloading'
                     ? '#395cb3'
                     : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
               }}
             >
               Offloading
@@ -88,9 +106,10 @@ function LiqoNavbar(props: ILiqoNavbar) {
             style={{
               color:
                 location.pathname === '/' ? '#395cb3' : 'rgba(255,255,255,0.5)',
+              cursor: 'pointer',
             }}
           >
-            <label>Map</label>
+            <label style={{ cursor: 'pointer' }}>Map</label>
           </Link>
           <Link
             to="/incoming"
@@ -102,7 +121,7 @@ function LiqoNavbar(props: ILiqoNavbar) {
                   : 'rgba(255,255,255,0.5)',
             }}
           >
-            <label>Incoming</label>
+            <label style={{ cursor: 'pointer' }}>Incoming</label>
           </Link>
         </Container>
       </Container>

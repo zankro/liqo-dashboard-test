@@ -5,10 +5,10 @@ import './ClusterBarChart.css';
 
 interface ClusterBarChartProps {
   cluster: ForeignCluster;
-  showRam: boolean;
+  metric: String;
 }
 
-function ClusterBarChart({ cluster, showRam }: ClusterBarChartProps) {
+function ClusterBarChart({ cluster, metric }: ClusterBarChartProps) {
   return (
     <>
       <Plot
@@ -16,21 +16,25 @@ function ClusterBarChart({ cluster, showRam }: ClusterBarChartProps) {
         key={cluster.name}
         data={[
           {
-            x: [showRam ? 'Memory (GB)' : 'CPU'],
+            x: [metric === 'Ram' ? 'Memory (GB)' : `${metric}`],
             y: [
-              showRam
+              metric === 'Ram'
                 ? bytesToGB(cluster.TotalUsedMemoryRecived)
-                : cluster.TotalUsedCpusRecived,
+                : metric === 'CPU'
+                ? cluster.TotalUsedCpusRecived
+                : 0,
             ],
             type: 'bar',
             name: 'Used',
           },
           {
-            x: [showRam ? 'Memory (GB)' : 'CPU'],
+            x: [metric === 'Ram' ? 'Memory (GB)' : `${metric}`],
             y: [
-              showRam
+              metric === 'Ram'
                 ? bytesToGB(cluster.TotalMemoryRecived)
-                : cluster.TotalCpusRecived,
+                : metric === 'CPU'
+                ? cluster.TotalCpusRecived
+                : 0,
             ],
             type: 'bar',
             name: 'Total',

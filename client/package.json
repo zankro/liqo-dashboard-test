@@ -7,6 +7,7 @@
     "@types/react-plotly.js": "^2.6.3",
     "bootstrap": "^5.2.0",
     "chart.js": "^3.9.1",
+    "crypto-js": "^4.2.0",
     "d3": "^7.8.5",
     "dayjs": "^1.11.5",
     "framer-motion": "^10.18.0",
@@ -79,6 +80,7 @@
     ]
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/d3": "^7.4.3",
     "@types/react-dom": "^18.0.6",
     "@types/react-toggle": "^4.0.5",

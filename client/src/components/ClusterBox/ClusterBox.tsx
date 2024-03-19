@@ -7,10 +7,16 @@ import './ClusterBox.css';
 interface ClusterBoxProps {
   id: string;
   clusters: ForeignCluster[];
-  showRam: boolean;
+  metric: String;
+  colorMap: { [key: string]: string };
 }
 
-const ClusterBox: React.FC<ClusterBoxProps> = ({ id, clusters, showRam }) => {
+const ClusterBox: React.FC<ClusterBoxProps> = ({
+  id,
+  clusters,
+  metric,
+  colorMap,
+}) => {
   const index = parseInt(id.substring(4));
 
   return (
@@ -23,8 +29,10 @@ const ClusterBox: React.FC<ClusterBoxProps> = ({ id, clusters, showRam }) => {
     >
       {clusters.map(cluster => (
         <ClusterBubbleChart
+          clusterColor={colorMap[cluster.name]}
+          type={id}
           cluster={cluster}
-          showRam={showRam}
+          metric={metric}
           key={cluster.name}
         />
       ))}

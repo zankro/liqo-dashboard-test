@@ -1,82 +1,53 @@
 import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 import { ForeignCluster } from '../../api/types';
-import { bytesToGB } from '../../utils/utils';
+import * as CryptoJS from 'crypto-js';
 import { Button, Card, Container } from 'react-bootstrap';
 import './Offloading.css';
-import RemoteClusterTreemapChart from '../clusterComponent/ClusterTreemapChart/RemoteClusterTreemapChart';
+import RemoteClusterPiemapChart from '../clusterComponent/ClusterPieChart/RemoteClusterPieChart';
 import LocalClusterTreemapChart from '../clusterComponent/ClusterTreemapChart/LocalClusterTreemapChart';
-import * as d3 from 'd3';
 
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
-  showRam: boolean;
+  metric: String;
   refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 }
 
 function Offloading(props: IClusterList) {
-  const { clusters, showRam } = props;
+  const { clusters, metric } = props;
   const localCluster = clusters.local[0];
   const offloadingClusters = clusters.remote.filter(
     c => c.outgoingPeering == 'Established'
   );
-  function hashString(str: String) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash << 4) - hash + str.charCodeAt(i);
-      hash |= 0; // Convert to 32bit integer
+  function hexToRgb(hex: string) {
+    hex = hex.substring(0, 6);
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    if (result) {
+      const rgb = {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      };
+      return `rgb(${rgb.r},${rgb.g},${rgb.b})`;
     }
-    return hash;
+    return 'rgb(1,1,100)';
   }
-  function hashColor(str: String) {
+
+  function hashString(str: string) {
+    const hash = CryptoJS.SHA256(str);
+    console.log(hash.toString(CryptoJS.enc.Hex));
+    return hash.toString(CryptoJS.enc.Hex);
+  }
+
+  function hashColor(str: string) {
     const hash = hashString(str);
-    const color = d3.interpolateRainbow(Math.abs(hash) / 0xffffffff);
+    const color = hexToRgb(hash); // Convert hash to a number
+    console.log(color);
     return color;
   }
 
-  const findDuplicates = (arr: string[]) =>
-    arr.filter((item: string, index: number) => arr.indexOf(item) !== index);
-
-  const modifyDuplicateColors = (colorsArray: string[], offset: number) => {
-    type colorMap = {
-      color: number;
-    };
-
-    const colorCounts: colorMap = {
-      color: 0,
-    };
-    colorsArray.forEach(color => {
-      type colorMap = {
-        [key: string]: number;
-      };
-
-      const colorCounts: colorMap = {
-        color: 0,
-      };
-
-      colorCounts[color] = (colorCounts[color] || 0) + 1;
-    });
-
-    let duplicates = findDuplicates(colorsArray);
-    while (duplicates.length > 0) {
-      duplicates.forEach(duplicate => {
-        const index = colorsArray.indexOf(duplicate);
-        colorsArray[index] = changeColor(duplicate, offset);
-      });
-      duplicates = findDuplicates(colorsArray);
-    }
-
-    return colorsArray;
-  };
-
-  const changeColor = (color: string, offset: number) => {
-    const hsl = d3.hsl(color);
-    hsl.h += offset * 2;
-
-    return hsl.toString();
-  };
-
-  if (clusters.local.length > 0) {
+  if (clusters.local.length > 0 && offloadingClusters.length > 0) {
     interface ClusterColorMap {
       [key: string]: string;
     }
@@ -88,34 +59,31 @@ function Offloading(props: IClusterList) {
       },
       {}
     );
-    console.log(modifyDuplicateColors(Object.values(clusterColorMap), 30));
 
-    const values = modifyDuplicateColors(Object.values(clusterColorMap), 30);
+    const values = Object.values(clusterColorMap);
     const keys = Object.keys(clusterColorMap);
     const newClusterColorMap: ClusterColorMap = {};
     keys.forEach((key, i) => {
       newClusterColorMap[key] = values[i];
     });
 
-    console.log(Object.values(newClusterColorMap));
-
     return (
       <Container className="no-side-margin">
         <Container className="center">
-          <h2>Cluster che offrono risorse</h2>
+          <h2>Clusters offering resources</h2>
           <LocalClusterTreemapChart
             localCluster={localCluster}
             remoteClusters={offloadingClusters}
-            showRam={showRam}
+            metric={metric}
             clusterColors={newClusterColorMap}
           />
         </Container>
         <Container className=" no-side-margin overflow-auto d-flex flex-row justify-content-start align-self-center">
           {offloadingClusters.map((cluster, i) => {
             return (
-              <RemoteClusterTreemapChart
+              <RemoteClusterPiemapChart
                 cluster={cluster}
-                showRam={showRam}
+                metric={metric}
                 key={i}
                 color={newClusterColorMap[cluster.name]}
               />
@@ -125,6 +93,17 @@ function Offloading(props: IClusterList) {
       </Container>
     );
   } else {
+    if (clusters.local.length !== 0 && offloadingClusters.length === 0) {
+      return (
+        <>
+          <Container className="no-side-margin">
+            <Container className="center">
+              <h2> No offloading clusters found </h2>
+            </Container>
+          </Container>
+        </>
+      );
+    }
     return <div> Loading... </div>;
   }
 }

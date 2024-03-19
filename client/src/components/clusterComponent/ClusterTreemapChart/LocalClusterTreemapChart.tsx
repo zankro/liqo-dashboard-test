@@ -12,14 +12,14 @@ interface colorMap {
 interface LocalClusterTreemapChart {
   remoteClusters: ForeignCluster[];
   localCluster: ForeignCluster;
-  showRam: boolean;
+  metric: String;
   clusterColors: colorMap;
 }
 
 function LocalClusterTreemapChart({
   remoteClusters,
   localCluster,
-  showRam,
+  metric,
   clusterColors,
 }: LocalClusterTreemapChart) {
   function hashString(str: String) {
@@ -131,39 +131,55 @@ function LocalClusterTreemapChart({
               remoteClusters.reduce(
                 (accumulator, cluster) =>
                   accumulator +
-                  (showRam
+                  (metric === 'Ram'
                     ? bytesToGB(cluster.TotalMemoryRecived)
-                    : cluster.TotalCpusRecived),
-                showRam
+                    : metric === 'CPU'
+                    ? cluster.TotalCpusRecived
+                    : 0),
+                metric === 'Ram'
                   ? bytesToGB(localCluster.TotalLocalMemory)
-                  : localCluster.TotalLocalCpus
+                  : metric === 'CPU'
+                  ? localCluster.TotalLocalCpus
+                  : 0
               ),
               ...remoteClusters.flatMap(cluster => [
-                showRam
+                metric === 'Ram'
                   ? bytesToGB(cluster.TotalMemoryRecived)
-                  : cluster.TotalCpusRecived,
-                showRam
+                  : metric === 'CPU'
+                  ? cluster.TotalCpusRecived
+                  : 0,
+                metric === 'Ram'
                   ? bytesToGB(
                       cluster.TotalMemoryRecived -
                         cluster.TotalUsedMemoryRecived
                     )
-                  : cluster.TotalCpusRecived - cluster.TotalUsedCpusRecived,
-                showRam
+                  : metric === 'CPU'
+                  ? cluster.TotalCpusRecived - cluster.TotalUsedCpusRecived
+                  : 0,
+                metric === 'Ram'
                   ? bytesToGB(cluster.TotalUsedMemoryRecived)
-                  : cluster.TotalUsedCpusRecived,
+                  : metric === 'CPU'
+                  ? cluster.TotalUsedCpusRecived
+                  : 0,
               ]),
-              showRam
+              metric === 'Ram'
                 ? bytesToGB(localCluster.TotalLocalMemory)
-                : localCluster.TotalLocalCpus,
-              showRam
+                : metric === 'CPU'
+                ? localCluster.TotalLocalCpus
+                : 0,
+              metric === 'Ram'
                 ? bytesToGB(
                     localCluster.TotalLocalMemory -
                       localCluster.TotalUsedLocalMemory
                   )
-                : localCluster.TotalLocalCpus - localCluster.TotalUsedLocalCpus,
-              showRam
+                : metric === 'CPU'
+                ? localCluster.TotalLocalCpus - localCluster.TotalUsedLocalCpus
+                : 0,
+              metric === 'Ram'
                 ? bytesToGB(localCluster.TotalUsedLocalMemory)
-                : localCluster.TotalUsedLocalCpus,
+                : metric === 'CPU'
+                ? localCluster.TotalUsedLocalCpus
+                : 0,
             ],
             textinfo: 'label+value+percent',
             marker: { colors: colors },

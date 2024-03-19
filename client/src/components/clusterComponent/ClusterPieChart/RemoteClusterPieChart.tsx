@@ -1,20 +1,20 @@
 import Plot from 'react-plotly.js';
 import { ForeignCluster } from '../../../api/types';
 import { bytesToGB } from '../../../utils/utils';
-import './ClusterTreemapChart.css';
+import './RemoteClusterPieChart.css';
 import * as d3 from 'd3';
 
-interface RemoteClusterTreemapChart {
+interface RemoteClusterPieChart {
   cluster: ForeignCluster;
   metric: String;
   color: string;
 }
 
-function RemoteClusterTreemapChart({
+function RemoteClusterPieChart({
   cluster,
   metric,
   color,
-}: RemoteClusterTreemapChart) {
+}: RemoteClusterPieChart) {
   function hashString(str: String) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -36,6 +36,23 @@ function RemoteClusterTreemapChart({
 
   console.log(clusterColor);
 
+  const values = [
+    metric === 'Ram'
+      ? bytesToGB(cluster.TotalMemoryRecived)
+      : metric === 'CPU'
+      ? cluster.TotalCpusRecived
+      : 0,
+    metric === 'Ram'
+      ? bytesToGB(cluster.TotalMemoryRecived)
+      : metric === 'CPU'
+      ? cluster.TotalCpusRecived
+      : 0,
+    metric === 'Ram'
+      ? bytesToGB(cluster.TotalUsedMemoryRecived)
+      : metric === 'CPU'
+      ? cluster.TotalUsedCpusRecived
+      : 0,
+  ];
   return (
     <>
       <Plot
@@ -43,15 +60,9 @@ function RemoteClusterTreemapChart({
         key={cluster.name}
         data={[
           {
-            labels: [cluster.name, 'Remaining', 'Used'],
-            parents: ['', cluster.name, cluster.name],
-            type: 'treemap',
+            labels: ['Remaining', 'Used'],
+            type: 'pie',
             values: [
-              metric === 'Ram'
-                ? bytesToGB(cluster.TotalMemoryRecived)
-                : metric === 'CPU'
-                ? cluster.TotalCpusRecived
-                : 0,
               metric === 'Ram'
                 ? bytesToGB(
                     cluster.TotalMemoryRecived - cluster.TotalUsedMemoryRecived
@@ -91,4 +102,4 @@ function RemoteClusterTreemapChart({
   );
 }
 
-export default RemoteClusterTreemapChart;
+export default RemoteClusterPieChart;

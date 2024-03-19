@@ -7,60 +7,81 @@ import { bytesToGB } from '../../../utils/utils';
 
 interface ClusterBubbleChartProps {
   cluster: ForeignCluster;
-  showRam: boolean;
+  metric: String;
+  type: String;
+  clusterColor: string;
 }
 
 const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
   cluster,
-  showRam,
+  metric,
+  type,
+  clusterColor,
 }) => {
-  const calculateSize = (cluster: ForeignCluster, showRam: boolean) => {
+  const calculateSize = (cluster: ForeignCluster, metric: String) => {
     let value = 0;
-    if (cluster.incomingPeering === 'Established') {
-      value += showRam
-        ? bytesToGB(cluster.TotalMemoryOffered)
-        : cluster.TotalCpusOffered;
-    }
-    if (cluster.outgoingPeering === 'Established') {
-      value += showRam
-        ? bytesToGB(cluster.TotalMemoryRecived)
-        : cluster.TotalCpusRecived;
+    if (
+      (cluster.incomingPeering === 'Established' && type === 'incoming') ||
+      type === 'local'
+    ) {
+      value +=
+        metric === 'Ram'
+          ? bytesToGB(cluster.TotalMemoryOffered)
+          : metric === 'CPU'
+          ? cluster.TotalCpusOffered
+          : 0;
     }
     if (
-      cluster.incomingPeering === 'Established' &&
-      cluster.outgoingPeering === 'Established'
+      (cluster.outgoingPeering === 'Established' && type === 'outgoing') ||
+      type === 'local'
     ) {
-      value = value / 2;
+      value +=
+        metric === 'Ram'
+          ? bytesToGB(cluster.TotalMemoryRecived)
+          : metric === 'CPU'
+          ? cluster.TotalCpusRecived
+          : 0;
     }
     return value;
   };
 
-  const size = calculateSize(cluster, showRam);
+  const size = calculateSize(cluster, metric);
 
   let hoverText = [
     <p key="name">
       {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
     </p>,
   ];
-  if (cluster.incomingPeering === 'Established') {
+  if (
+    cluster.incomingPeering === 'Established' &&
+    (type === 'incoming' || type === 'local')
+  ) {
     hoverText.push(
       <p key="incoming">
-        {showRam
+        {metric === 'Ram'
           ? `TotalMemoryOffered: ${bytesToGB(cluster.TotalMemoryOffered)} GB`
-          : `TotalCpusOffered: ${cluster.TotalCpusOffered} MilliCores`}
+          : metric === 'CPU'
+          ? `TotalCpusOffered: ${cluster.TotalCpusOffered} MilliCores`
+          : 'No value Found'}
       </p>
     );
   }
-  if (cluster.outgoingPeering === 'Established') {
+  if (
+    cluster.outgoingPeering === 'Established' &&
+    (type === 'outgoing' || type === 'local')
+  ) {
     hoverText.push(
       <p key="outgoing">
-        {showRam
+        {metric === 'Ram'
           ? `TotalMemoryRecived: ${bytesToGB(cluster.TotalMemoryRecived)} GB`
-          : `TotalCpusOffered: ${cluster.TotalCpusRecived} MilliCores`}
+          : metric === 'CPU'
+          ? `TotalCpusOffered: ${cluster.TotalCpusRecived} MilliCores`
+          : 'No value Found'}
       </p>
     );
   }
-  hoverText.push(<p key="latency">{`Latency: ${cluster.Latency.value}`}</p>);
+  if (cluster.Latency.value)
+    hoverText.push(<p key="latency">{`Latency: ${cluster.Latency.value}`}</p>);
 
   return (
     <Container>
@@ -80,16 +101,7 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
         <Container className="overflow-hidden d-flex flex-column justify-content-center align-items-center">
           {cluster.name.charAt(0).toUpperCase() + cluster.name.slice(1)}
           {cluster.networking !== '' ? (
-            <BsCircleFill
-              size={5 * size}
-              color={
-                cluster.incomingPeering !== 'Established'
-                  ? '#8FBC8F'
-                  : cluster.outgoingPeering !== 'Established'
-                  ? '#CB3234'
-                  : '#FF7514'
-              }
-            />
+            <BsCircleFill size={5 * size} color={clusterColor} />
           ) : (
             <GrCloudComputer size={80} id={cluster.name} />
           )}

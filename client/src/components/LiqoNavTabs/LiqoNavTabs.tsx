@@ -10,12 +10,12 @@ import { useXarrow } from 'react-xarrows';
 
 export interface IClusterList {
   clusters: { [key: string]: ForeignCluster[] };
-  showRam: boolean;
+  metric: String;
   refs: React.MutableRefObject<(HTMLDivElement | null)[]>;
 }
 
 function LiqoNavTabs(props: IClusterList) {
-  const { clusters, refs, showRam } = props;
+  const { clusters, refs, metric } = props;
   const localCluster = clusters.local[0];
   return <div></div>;
 }

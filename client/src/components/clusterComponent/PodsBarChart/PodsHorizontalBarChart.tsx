@@ -3,37 +3,54 @@ import Plot from 'react-plotly.js';
 import { bytesToGB } from '../../../utils/utils';
 import { PodResourceMetrics } from '../../../api/types';
 import { ForeignCluster } from '../../../api/types';
+import * as CryptoJS from 'crypto-js';
 import * as d3 from 'd3';
-import { isConstructorDeclaration } from 'typescript';
 
 interface Props {
   cluster: ForeignCluster;
-  showRam: boolean;
+  metric: String;
 }
 
-const hashString = (str: string) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 4) - hash + str.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
+function hexToRgb(hex: string) {
+  hex = hex.substring(0, 6);
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
-const hashColor = (str: string) => {
+  if (result) {
+    const rgb = {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16),
+    };
+    return `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+  }
+  return 'rgb(1,1,100)';
+}
+
+function hashString(str: string) {
+  const hash = CryptoJS.SHA256(str);
+  console.log(hash.toString(CryptoJS.enc.Hex));
+  return hash.toString(CryptoJS.enc.Hex);
+}
+
+function hashColor(str: string) {
   const hash = hashString(str);
-  const color = d3.interpolateRainbow(Math.abs(hash) / 0xffffffff);
+  const color = hexToRgb(hash); // Convert hash to a number
+  console.log(color);
   return color;
-};
+}
 
 const darkenColor = (color: string, ratio: number) => {
   const darker = d3.hsl(color).darker(ratio);
   return darker.toString();
 };
 
-const PodsHorizontalBarChart: React.FC<Props> = ({ cluster, showRam }) => {
+const PodsHorizontalBarChart: React.FC<Props> = ({ cluster, metric }) => {
   const xData = cluster.incomingResources.map((pod: PodResourceMetrics) =>
-    showRam ? bytesToGB(pod.PodTotalMemory * 1024) : pod.PodTotalCpus
+    metric === 'Ram'
+      ? bytesToGB(pod.PodTotalMemory * 1024)
+      : metric === 'CPU'
+      ? pod.PodTotalCpus
+      : 0
   );
 
   console.log(cluster.incomingResources, xData);
@@ -53,9 +70,14 @@ const PodsHorizontalBarChart: React.FC<Props> = ({ cluster, showRam }) => {
         },
       ]}
       layout={{
-        title: showRam
-          ? `${cluster.name} Pod's Memory in MB`
-          : `${cluster.name} Pod's CPUs in milliCores`,
+        title:
+          metric === 'Ram'
+            ? `${cluster.name} Pod's Memory in MB`
+            : metric === 'CPU'
+            ? `${cluster.name} Pod's CPUs in milliCores`
+            : metric === 'GPU'
+            ? `${cluster.name} Pod's GPUs in milliCores`
+            : '',
         width: 600, // Increase the height of the plot
         margin: {
           l: 100, // Increase the left margin
