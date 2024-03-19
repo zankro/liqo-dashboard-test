@@ -4,16 +4,58 @@ import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 import ClusterBox from '../ClusterBox/ClusterBox';
 import { Container, Card } from 'react-bootstrap';
 import ClusterBubbleChart from '../clusterComponent/ClusterBubbleChart/ClusterBubbleChart';
+import './FrecceContainer.css';
+import * as CryptoJS from 'crypto-js';
+
 interface FrecceContainerProps {
   localCluster: ForeignCluster;
   remoteClusters: ForeignCluster[];
-  showRam: boolean;
+  metric: String;
 }
 const FrecceContainer: React.FC<FrecceContainerProps> = ({
   localCluster,
   remoteClusters,
-  showRam,
+  metric,
 }) => {
+  function hexToRgb(hex: string) {
+    hex = hex.substring(0, 6);
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    if (result) {
+      const rgb = {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      };
+      return `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+    }
+    return 'rgb(1,1,100)';
+  }
+
+  function hashString(str: string) {
+    const hash = CryptoJS.SHA256(str);
+    console.log(hash.toString(CryptoJS.enc.Hex));
+    return hash.toString(CryptoJS.enc.Hex);
+  }
+
+  function hashColor(str: string) {
+    const hash = hashString(str);
+    const color = hexToRgb(hash); // Convert hash to a number
+    console.log(color);
+    return color;
+  }
+
+  interface ClusterColorMap {
+    [key: string]: string;
+  }
+
+  const clusterColorMap: ClusterColorMap = remoteClusters.reduce(
+    (map: ClusterColorMap, cluster, i) => {
+      map[cluster.name] = hashColor(cluster.name); // replace 'i' with the color you want to assign
+      return map;
+    },
+    {}
+  );
   return (
     <Container
       style={{
@@ -29,26 +71,29 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
               paddingBottom: '100px',
             }}
           >
-            <ClusterBubbleChart cluster={localCluster} showRam={showRam} />
+            <ClusterBubbleChart
+              clusterColor={'#ff0000'}
+              type={'local'}
+              cluster={localCluster}
+              metric={metric}
+            />
           </div>
 
           <Container className="d-flex flex-row justify-content-between">
             {remoteClusters.filter(
-              cluster =>
-                cluster.incomingPeering === 'Established' &&
-                cluster.outgoingPeering !== 'Established'
+              cluster => cluster.incomingPeering === 'Established'
             ).length > 0 ? (
               <>
-                <Card className="incoming">
+                <Card id={'incomingCard'} className="incoming">
+                  <Card.Title>Incoming</Card.Title>
                   <ClusterBox
+                    colorMap={clusterColorMap}
                     clusters={remoteClusters.filter(
-                      cluster =>
-                        cluster.incomingPeering === 'Established' &&
-                        cluster.outgoingPeering !== 'Established'
+                      cluster => cluster.incomingPeering === 'Established'
                     )}
                     id={`incoming`}
                     key={'incoming'}
-                    showRam={showRam}
+                    metric={metric}
                   />
                 </Card>
 
@@ -58,7 +103,7 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                   showHead={false}
                   start={localCluster.name}
                   key={'incomingArrow'}
-                  end={`incoming`}
+                  end={`incomingCard`}
                 />
               </>
             ) : (
@@ -66,52 +111,19 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
             )}
 
             {remoteClusters.filter(
-              cluster =>
-                cluster.incomingPeering === 'Established' &&
-                cluster.outgoingPeering === 'Established'
+              cluster => cluster.outgoingPeering == 'Established'
             ).length > 0 ? (
               <>
-                <Card className="both">
+                <Card id={'outgoingCard'} className="outgoing">
+                  <Card.Title>Outgoing</Card.Title>
                   <ClusterBox
+                    colorMap={clusterColorMap}
                     clusters={remoteClusters.filter(
-                      cluster =>
-                        cluster.incomingPeering === 'Established' &&
-                        cluster.outgoingPeering === 'Established'
-                    )}
-                    id={`both`}
-                    key={'both'}
-                    showRam={showRam}
-                  />
-                </Card>
-                <Xarrow
-                  endAnchor="top"
-                  showTail={true}
-                  showHead={true}
-                  start={localCluster.name}
-                  key={'bothArrow'}
-                  end={`both`}
-                />
-              </>
-            ) : (
-              ''
-            )}
-
-            {remoteClusters.filter(
-              cluster =>
-                cluster.outgoingPeering == 'Established' &&
-                cluster.incomingPeering !== 'Established'
-            ).length > 0 ? (
-              <>
-                <Card className="outgoing">
-                  <ClusterBox
-                    clusters={remoteClusters.filter(
-                      cluster =>
-                        cluster.outgoingPeering === 'Established' &&
-                        cluster.incomingPeering !== 'Established'
+                      cluster => cluster.outgoingPeering === 'Established'
                     )}
                     id={`outgoing`}
                     key={`outgoing`}
-                    showRam={showRam}
+                    metric={metric}
                   />
                 </Card>
                 <Xarrow
@@ -119,7 +131,7 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
                   showHead={true}
                   start={localCluster.name}
                   key={'outgoingArrow'}
-                  end={`outgoing`}
+                  end={`outgoingCard`}
                 />
               </>
             ) : (

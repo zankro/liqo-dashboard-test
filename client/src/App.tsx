@@ -18,7 +18,7 @@ function App() {
   );
   const [currentCluster, setCurrentCluster] = useState<ForeignCluster>();
   const [init, setInit] = useState<Boolean>(true);
-  const [showRam, setShowRam] = useState<boolean>(true);
+  const [metric, setMetric] = useState<String>('Ram');
   const [isLoading, setIsLoading] = useState(true); // Aggiungi questa linea
   const refs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -80,8 +80,8 @@ function App() {
             element={
               <DefaultLayout
                 loading={isLoading}
-                showRam={showRam}
-                setShowRam={setShowRam}
+                metric={metric}
+                setMetric={setMetric}
               />
             }
           >
@@ -90,7 +90,7 @@ function App() {
               element={
                 <LayoutFrecceContainer
                   clusters={clusters}
-                  showRam={showRam}
+                  metric={metric}
                   refs={refs}
                 />
               }
@@ -98,13 +98,13 @@ function App() {
             <Route
               path="Offloading"
               element={
-                <Offloading showRam={showRam} clusters={clusters} refs={refs} />
+                <Offloading metric={metric} clusters={clusters} refs={refs} />
               }
             />
             <Route
               path="Incoming"
               element={
-                <Incoming showRam={showRam} clusters={clusters} refs={refs} />
+                <Incoming metric={metric} clusters={clusters} refs={refs} />
               }
             />
             <Route path="*" element={<NotFoundPage />} />

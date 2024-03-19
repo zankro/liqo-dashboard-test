@@ -2,13 +2,13 @@ import LiqoNavbar from './components/LiqoNavbar/LiqoNavbar';
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 export interface LayoutProps {
-  showRam: boolean;
-  setShowRam: (showRam: boolean) => void;
+  metric: String;
+  setMetric: (metric: String) => void;
   loading: boolean;
 }
 
 function Layout(props: LayoutProps) {
-  const { showRam, setShowRam, loading } = props;
+  const { metric, setMetric, loading } = props;
   return (
     <div
       style={{
@@ -16,7 +16,7 @@ function Layout(props: LayoutProps) {
         flexDirection: 'column',
       }}
     >
-      <LiqoNavbar showRam={showRam} setShowRam={setShowRam} />
+      <LiqoNavbar metric={metric} setMetric={setMetric} />
       {loading ? (
         <div className="d-flex justify-content-center align-items-center">
           Loading...
