@@ -137,9 +137,9 @@ function LocalClusterTreemapChart({
                     ? cluster.TotalCpusRecived
                     : 0),
                 metric === 'Ram'
-                  ? bytesToGB(localCluster.TotalLocalMemory)
+                  ? bytesToGB(localCluster.clusterMemory)
                   : metric === 'CPU'
-                  ? localCluster.TotalLocalCpus
+                  ? localCluster.clusterCPU
                   : 0
               ),
               ...remoteClusters.flatMap(cluster => [
@@ -163,22 +163,21 @@ function LocalClusterTreemapChart({
                   : 0,
               ]),
               metric === 'Ram'
-                ? bytesToGB(localCluster.TotalLocalMemory)
+                ? bytesToGB(localCluster.clusterMemory)
                 : metric === 'CPU'
-                ? localCluster.TotalLocalCpus
+                ? localCluster.clusterCPU
                 : 0,
               metric === 'Ram'
                 ? bytesToGB(
-                    localCluster.TotalLocalMemory -
-                      localCluster.TotalUsedLocalMemory
+                    localCluster.clusterMemory - localCluster.clusterMemoryUsage
                   )
                 : metric === 'CPU'
-                ? localCluster.TotalLocalCpus - localCluster.TotalUsedLocalCpus
+                ? localCluster.clusterCPU - localCluster.clusterCpuUsage
                 : 0,
               metric === 'Ram'
-                ? bytesToGB(localCluster.TotalUsedLocalMemory)
+                ? bytesToGB(localCluster.clusterMemoryUsage)
                 : metric === 'CPU'
-                ? localCluster.TotalUsedLocalCpus
+                ? localCluster.clusterCpuUsage
                 : 0,
             ],
             textinfo: 'label+value+percent',
