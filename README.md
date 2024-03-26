@@ -2,7 +2,8 @@
 
 ## Prerequisiti:
 `Nodejs e npm`
-Avere un cluster up con liqo installato
+Avere un cluster up con liqo installato. 
+Metrics server installato sul cluster Kubernetes.
 
 ## Per runnare il client
 `cd client`
