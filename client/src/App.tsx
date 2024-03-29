@@ -47,7 +47,7 @@ function App() {
     }
     const interval = setInterval(() => {
       setInit(true);
-    }, 10000);
+    }, 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchAndSetCluster, init]);
 

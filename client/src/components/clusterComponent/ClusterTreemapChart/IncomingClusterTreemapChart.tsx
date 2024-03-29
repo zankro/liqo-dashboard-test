@@ -60,31 +60,17 @@ const IncomingClusterTreemapChart: React.FC<
     }),
   ];
   const values = [
-    metric === 'Ram'
-      ? bytesToGB(localCluster.clusterMemory)
-      : metric === 'CPU'
-      ? localCluster.clusterCPU
-      : 0,
-    ...remoteClusters.flatMap(cluster => [
+    ...remoteClusters.map(cluster =>
       metric === 'Ram'
         ? bytesToGB(cluster.TotalMemoryOffered)
         : metric === 'CPU'
         ? cluster.TotalCpusOffered
-        : 0,
-      metric === 'Ram'
-        ? bytesToGB(cluster.TotalMemoryOffered - cluster.TotalUsedMemoryOffered)
-        : metric === 'CPU'
-        ? cluster.TotalCpusOffered - cluster.TotalUsedCpusOffered
-        : 0,
-      metric === 'Ram'
-        ? bytesToGB(cluster.TotalUsedMemoryOffered)
-        : metric === 'CPU'
-        ? cluster.TotalUsedCpusOffered
-        : 0,
-    ]),
+        : 0
+    ),
   ];
 
-  console.log(values);
+  const tot =
+    Math.ceil(values.reduce((acc, val) => acc + val, 0) * 10) / 10 + 0.02;
 
   return (
     <Plot
@@ -107,30 +93,31 @@ const IncomingClusterTreemapChart: React.FC<
               cluster.name,
             ]),
           ],
-          branchvalues: 'remainder',
+          branchvalues: 'total',
           type: 'treemap',
           domain: { x: [0, 1], y: [0, 1] },
           values: [
-            metric === 'Ram'
-              ? bytesToGB(localCluster.clusterMemory)
-              : metric === 'CPU'
-              ? localCluster.clusterCPU
-              : 0,
+            tot,
             ...remoteClusters.flatMap(cluster => [
               metric === 'Ram'
-                ? bytesToGB(cluster.TotalMemoryOffered)
+                ? Math.ceil(bytesToGB(cluster.TotalMemoryOffered) * 100) / 100 +
+                  0.01
                 : metric === 'CPU'
                 ? cluster.TotalCpusOffered
                 : 0,
               metric === 'Ram'
-                ? bytesToGB(
-                    cluster.TotalMemoryOffered - cluster.TotalUsedMemoryOffered
-                  )
+                ? Math.floor(
+                    bytesToGB(
+                      cluster.TotalMemoryOffered -
+                        cluster.TotalUsedMemoryOffered
+                    ) * 100
+                  ) / 100
                 : metric === 'CPU'
                 ? cluster.TotalCpusOffered - cluster.TotalUsedCpusOffered
                 : 0,
               metric === 'Ram'
-                ? bytesToGB(cluster.TotalUsedMemoryOffered)
+                ? Math.floor(bytesToGB(cluster.TotalUsedMemoryOffered) * 100) /
+                  100
                 : metric === 'CPU'
                 ? cluster.TotalUsedCpusOffered
                 : 0,

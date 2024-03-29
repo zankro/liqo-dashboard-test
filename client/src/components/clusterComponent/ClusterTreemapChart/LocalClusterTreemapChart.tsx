@@ -191,8 +191,7 @@ function LocalClusterTreemapChart({
                 : 0,
               metric === 'Ram'
                 ? bytesToGB(
-                    localCluster.clusterMemory -
-                      localCluster.clusterMemoryUsage
+                    localCluster.clusterMemory - localCluster.clusterMemoryUsage
                   )
                 : metric === 'CPU'
                 ? localCluster.clusterCPU - localCluster.clusterCpuUsage
