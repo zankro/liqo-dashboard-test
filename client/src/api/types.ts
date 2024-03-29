@@ -17,10 +17,10 @@ export type ForeignCluster = {
   TotalCpusOffered: number;
   Latency: ConnectionLatency;
   localResources: LocalResources[];
-  TotalUsedLocalCpus: number;
-  TotalUsedLocalMemory: number;
-  TotalLocalCpus: number;
-  TotalLocalMemory: number;
+  clusterCpuUsage: number;
+  clusterMemoryUsage: number;
+  clusterCPU: number;
+  clusterMemory: number;
 };
 
 export type NodeResourceMetrics = {

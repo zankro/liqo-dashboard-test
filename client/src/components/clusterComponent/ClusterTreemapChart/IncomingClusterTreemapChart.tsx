@@ -61,9 +61,9 @@ const IncomingClusterTreemapChart: React.FC<
   ];
   const values = [
     metric === 'Ram'
-      ? bytesToGB(localCluster.TotalLocalMemory)
+      ? bytesToGB(localCluster.clusterMemory)
       : metric === 'CPU'
-      ? localCluster.TotalLocalCpus
+      ? localCluster.clusterCPU
       : 0,
     ...remoteClusters.flatMap(cluster => [
       metric === 'Ram'
@@ -112,9 +112,9 @@ const IncomingClusterTreemapChart: React.FC<
           domain: { x: [0, 1], y: [0, 1] },
           values: [
             metric === 'Ram'
-              ? bytesToGB(localCluster.TotalLocalMemory)
+              ? bytesToGB(localCluster.clusterMemory)
               : metric === 'CPU'
-              ? localCluster.TotalLocalCpus
+              ? localCluster.clusterCPU
               : 0,
             ...remoteClusters.flatMap(cluster => [
               metric === 'Ram'

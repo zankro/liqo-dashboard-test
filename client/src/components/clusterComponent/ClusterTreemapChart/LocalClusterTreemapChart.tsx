@@ -94,7 +94,29 @@ function LocalClusterTreemapChart({
   };
 
   const modifiedColors = modifyDuplicateColors(colors, 30);
-  console.log(modifiedColors);
+  console.log(localCluster);
+
+  const values = [
+    remoteClusters.reduce(
+      (accumulator, cluster) =>
+        accumulator +
+        (metric === 'Ram'
+          ? bytesToGB(cluster.TotalMemoryRecived)
+          : metric === 'CPU'
+          ? cluster.TotalCpusRecived
+          : 0),
+      metric === 'Ram'
+        ? bytesToGB(localCluster.clusterMemory)
+        : metric === 'CPU'
+        ? localCluster.clusterCPU
+        : 0
+    ),
+    metric === 'Ram'
+      ? bytesToGB(localCluster.clusterMemory)
+      : metric === 'CPU'
+      ? localCluster.clusterCPU
+      : 0
+  ];
 
   return (
     <>
@@ -137,9 +159,9 @@ function LocalClusterTreemapChart({
                     ? cluster.TotalCpusRecived
                     : 0),
                 metric === 'Ram'
-                  ? bytesToGB(localCluster.TotalLocalMemory)
+                  ? bytesToGB(localCluster.clusterMemory)
                   : metric === 'CPU'
-                  ? localCluster.TotalLocalCpus
+                  ? localCluster.clusterCPU
                   : 0
               ),
               ...remoteClusters.flatMap(cluster => [
@@ -163,22 +185,22 @@ function LocalClusterTreemapChart({
                   : 0,
               ]),
               metric === 'Ram'
-                ? bytesToGB(localCluster.TotalLocalMemory)
+                ? bytesToGB(localCluster.clusterMemory)
                 : metric === 'CPU'
-                ? localCluster.TotalLocalCpus
+                ? localCluster.clusterCPU
                 : 0,
               metric === 'Ram'
                 ? bytesToGB(
-                    localCluster.TotalLocalMemory -
-                      localCluster.TotalUsedLocalMemory
+                    localCluster.clusterMemory -
+                      localCluster.clusterMemoryUsage
                   )
                 : metric === 'CPU'
-                ? localCluster.TotalLocalCpus - localCluster.TotalUsedLocalCpus
+                ? localCluster.clusterCPU - localCluster.clusterCpuUsage
                 : 0,
               metric === 'Ram'
-                ? bytesToGB(localCluster.TotalUsedLocalMemory)
+                ? bytesToGB(localCluster.clusterMemoryUsage)
                 : metric === 'CPU'
-                ? localCluster.TotalUsedLocalCpus
+                ? localCluster.clusterCpuUsage
                 : 0,
             ],
             textinfo: 'label+value+percent',

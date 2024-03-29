@@ -26,10 +26,10 @@ const fakeResponse = [
         "TotalUsedCpusRecived": 0,
         "TotalMemoryRecived": 21512000000,
         "TotalCpusRecived": 41.4,
-        "TotalUsedLocalCpus": 0,
-        "TotalUsedLocalMemory": 20512000000,
-        "TotalLocalCpus": 55.53,
-        "TotalLocalMemory": 21512000000,
+        "clusterCpuUsage": 0,
+        "clusterMemoryUsage": 20512000000,
+        "clusterCPU": 55.53,
+        "clusterMemory": 21512000000,
         "Latency": {
           "timestamp": null
         },
@@ -117,7 +117,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },
       {
         "name": "ClusterIncoming",
@@ -179,7 +179,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },
       {
         "name": "ciao",
@@ -241,7 +241,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },{
         "name": "ClusterOutgoing3",
         "networking": "Established",
@@ -302,7 +302,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },{
         "name": "ClusterOutgoing4",
         "networking": "Established",
@@ -363,7 +363,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },{
         "name": "ClusterOutgoing5",
         "networking": "Established",
@@ -424,7 +424,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },{
         "name": "dddddd",
         "networking": "Established",
@@ -485,7 +485,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },
       {
         "name": "ClusterOutgoing1",
@@ -547,7 +547,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       },
       {
         "name": "ClusterOutgoing2",
@@ -609,7 +609,7 @@ const fakeResponse = [
         },
         "localResources": null,
         "TotalLocalCpuUsed": 0,
-        "TotalLocalMemoryUsed": 12455936,
+        "clusterMemoryUsed": 12455936,
       }
     ]
   }
