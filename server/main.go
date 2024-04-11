@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Test")
 	klog.InitFlags(nil)
 	flag.Parse()
 	ctx := context.Background()

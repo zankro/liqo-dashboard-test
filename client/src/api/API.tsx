@@ -2,7 +2,7 @@ import { ForeignCluster } from './types';
 
 function getPeerings(): Promise<{ [key: string]: ForeignCluster[] }> {
   return get<{ [key: string]: ForeignCluster[] }>(
-    'http://localhost:8089/api/foreign_clusters'
+    `http://${process.env.backend_address}${process.env.backend_port}/api/foreign_clusters`
   )
     .then((clusters: { [key: string]: ForeignCluster[] }) => {
       return clusters;
