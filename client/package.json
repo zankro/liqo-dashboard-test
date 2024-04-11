@@ -1,0 +1,104 @@
+{
+  "name": "liqo_dashboard_fe",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/react-icons": "^3.0.0",
+    "@types/react-plotly.js": "^2.6.3",
+    "bootstrap": "^5.2.0",
+    "chart.js": "^3.9.1",
+    "crypto-js": "^4.2.0",
+    "d3": "^7.8.5",
+    "dayjs": "^1.11.5",
+    "framer-motion": "^10.18.0",
+    "graph": "^0.2.0",
+    "plotly.js": "^2.27.1",
+    "plotly.js-basic-dist": "^2.27.1",
+    "plotly.js-dist": "^2.27.1",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-chartjs-2": "^4.3.1",
+    "react-circular-progressbar": "^2.1.0",
+    "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
+    "react-ga": "^3.3.1",
+    "react-icons": "^4.4.0",
+    "react-plotly.js": "^2.6.0",
+    "react-responsive": "^9.0.0-beta.10",
+    "react-router-dom": "^6.21.3",
+    "react-scripts": "5.0.1",
+    "react-toggle": "^4.1.3",
+    "react-xarrows": "^2.0.2",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "dev": "chmod +x ./env_reader.sh && ./env_reader.sh && cp env-config.js ./public/ && react-scripts start",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "react/no-multi-comp": "error",
+      "react/jsx-pascal-case": "error",
+      "react/prop-types": "off",
+      "no-nested-ternary": "off",
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "error",
+            "info"
+          ]
+        }
+      ],
+      "react/jsx-indent": "off",
+      "react/jsx-wrap-multilines": [
+        "error",
+        {
+          "declaration": false
+        }
+      ]
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/d3": "^7.4.3",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-toggle": "^4.0.5",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "2.7.1"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "endOfLine": "lf"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,graphql}": [
+      "prettier --write"
+    ]
+  }
+}

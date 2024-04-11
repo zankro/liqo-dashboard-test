@@ -1,0 +1,25 @@
+.nav-tabs {
+  --bs-nav-tabs-border-width: 0px;
+}
+
+.nav-tabs .nav-link {
+  border-radius: 0px !important;
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(33, 37, 41, 1);
+  font-size: 18px;
+}
+
+.nav-tabs .nav-link.active {
+  color: #395cb3;
+  background-color: rgba(33, 37, 41, 1);
+  border-color: rgba(33, 37, 41, 1);
+}
+
+.nav-tabs .nav-link.hover {
+  border-color: rgba(33, 37, 41, 0.9);
+  border-radius: 20px !important;
+}
+
+.tab-content {
+  width: 100%;
+}
