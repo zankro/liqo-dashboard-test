@@ -115,7 +115,7 @@ function LocalClusterTreemapChart({
       ? bytesToGB(localCluster.clusterMemory)
       : metric === 'CPU'
       ? localCluster.clusterCPU
-      : 0
+      : 0,
   ];
 
   return (

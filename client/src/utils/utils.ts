@@ -80,5 +80,7 @@ export function capitalizeFirstLetter(string: string) {
 }
 
 export function bytesToGB(bytes: number): number {
-  return parseFloat((Math.floor((bytes / Math.pow(2, 30))*1000)/1000).toFixed(3));
+  return parseFloat(
+    (Math.floor((bytes / Math.pow(2, 30)) * 1000) / 1000).toFixed(3)
+  );
 }
