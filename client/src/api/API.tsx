@@ -1,8 +1,11 @@
 import { ForeignCluster } from './types';
 
 function getPeerings(): Promise<{ [key: string]: ForeignCluster[] }> {
+const backend_address = process.env.REACT_APP_BACKEND_ADDRESS;
+const backend_port = process.env.REACT_APP_BACKEND_PORT;
+console.log(`http://${backend_address}:${backend_port}/api/foreign_clusters`);
   return get<{ [key: string]: ForeignCluster[] }>(
-    `http://${process.env.backend_address}${process.env.backend_port}/api/foreign_clusters`
+    `http://${backend_address}:${backend_port}/api/foreign_clusters`
   )
     .then((clusters: { [key: string]: ForeignCluster[] }) => {
       return clusters;
