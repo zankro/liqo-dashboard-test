@@ -38,19 +38,19 @@ function RemoteClusterPieChart({
 
   const values = [
     metric === 'Ram'
-      ? bytesToGB(cluster.TotalMemoryRecived)
+      ? bytesToGB(cluster.TotalMemoryReceived)
       : metric === 'CPU'
-      ? cluster.TotalCpusRecived
+      ? cluster.TotalCpusReceived
       : 0,
     metric === 'Ram'
-      ? bytesToGB(cluster.TotalMemoryRecived)
+      ? bytesToGB(cluster.TotalMemoryReceived)
       : metric === 'CPU'
-      ? cluster.TotalCpusRecived
+      ? cluster.TotalCpusReceived
       : 0,
     metric === 'Ram'
-      ? bytesToGB(cluster.TotalUsedMemoryRecived)
+      ? bytesToGB(cluster.TotalUsedMemoryReceived)
       : metric === 'CPU'
-      ? cluster.TotalUsedCpusRecived
+      ? cluster.TotalUsedCpusReceived
       : 0,
   ];
   return (
@@ -65,15 +65,15 @@ function RemoteClusterPieChart({
             values: [
               metric === 'Ram'
                 ? bytesToGB(
-                    cluster.TotalMemoryRecived - cluster.TotalUsedMemoryRecived
+                    cluster.TotalMemoryReceived - cluster.TotalUsedMemoryReceived
                   )
                 : metric === 'CPU'
-                ? cluster.TotalCpusRecived - cluster.TotalUsedCpusRecived
+                ? cluster.TotalCpusReceived - cluster.TotalUsedCpusReceived
                 : 0,
               metric === 'Ram'
-                ? bytesToGB(cluster.TotalUsedMemoryRecived)
+                ? bytesToGB(cluster.TotalUsedMemoryReceived)
                 : metric === 'CPU'
-                ? cluster.TotalUsedCpusRecived
+                ? cluster.TotalUsedCpusReceived
                 : 0,
             ],
             marker: {

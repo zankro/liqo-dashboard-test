@@ -19,9 +19,9 @@ function ClusterBarChart({ cluster, metric }: ClusterBarChartProps) {
             x: [metric === 'Ram' ? 'Memory (GB)' : `${metric}`],
             y: [
               metric === 'Ram'
-                ? bytesToGB(cluster.TotalUsedMemoryRecived)
+                ? bytesToGB(cluster.TotalUsedMemoryReceived)
                 : metric === 'CPU'
-                ? cluster.TotalUsedCpusRecived
+                ? cluster.TotalUsedCpusReceived
                 : 0,
             ],
             type: 'bar',
@@ -31,9 +31,9 @@ function ClusterBarChart({ cluster, metric }: ClusterBarChartProps) {
             x: [metric === 'Ram' ? 'Memory (GB)' : `${metric}`],
             y: [
               metric === 'Ram'
-                ? bytesToGB(cluster.TotalMemoryRecived)
+                ? bytesToGB(cluster.TotalMemoryReceived)
                 : metric === 'CPU'
-                ? cluster.TotalCpusRecived
+                ? cluster.TotalCpusReceived
                 : 0,
             ],
             type: 'bar',
