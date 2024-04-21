@@ -6,20 +6,20 @@ touch ./env-config.js
 
 echo "window._env_ = {" >> ./env-config.js
 
-# Read each line in .env file
-while read -r line || [[ -n "$line" ]];
-do
-  if printf '%s\n' "$line" | grep -q -e '='; then
-    varname=$(printf '%s\n' "$line" | sed -e 's/=.*//')
-    varvalue=$(printf '%s\n' "$line" | sed -e 's/^[^=]*=//')
-  fi
+# List of environment variables to read
+vars=("REACT_APP_BACKEND_ADDRESS" "REACT_APP_BACKEND_PORT")
 
+for varname in "${vars[@]}"
+do
   value=$(printf '%s\n' "${!varname}")
-  # Otherwise use value from .env file
-  [[ -z $value ]] && value=${varvalue}
+  
+  if [[ -z $value ]]; then
+    echo "Environment variable $varname is not set"
+    exit 1
+  fi
   
   echo "  $varname: \"$value\"," >> ./env-config.js
-done < .env
+done
 
 echo "}" >> ./env-config.js
 

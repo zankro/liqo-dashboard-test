@@ -85,7 +85,9 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
             ).length > 0 ? (
               <>
                 <Card id={'incomingCard'} className="incoming">
-                  <Card.Title className="centered-card-title">Incoming</Card.Title>
+                  <Card.Title className="centered-card-title">
+                    Incoming
+                  </Card.Title>
                   <ClusterBox
                     colorMap={clusterColorMap}
                     clusters={remoteClusters.filter(
@@ -115,7 +117,9 @@ const FrecceContainer: React.FC<FrecceContainerProps> = ({
             ).length > 0 ? (
               <>
                 <Card id={'outgoingCard'} className="outgoing">
-                  <Card.Title className="centered-card-title">Outgoing</Card.Title>
+                  <Card.Title className="centered-card-title">
+                    Outgoing
+                  </Card.Title>
                   <ClusterBox
                     colorMap={clusterColorMap}
                     clusters={remoteClusters.filter(

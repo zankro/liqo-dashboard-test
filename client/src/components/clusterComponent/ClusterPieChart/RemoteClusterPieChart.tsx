@@ -65,7 +65,8 @@ function RemoteClusterPieChart({
             values: [
               metric === 'Ram'
                 ? bytesToGB(
-                    cluster.TotalMemoryReceived - cluster.TotalUsedMemoryReceived
+                    cluster.TotalMemoryReceived -
+                      cluster.TotalUsedMemoryReceived
                   )
                 : metric === 'CPU'
                 ? cluster.TotalCpusReceived - cluster.TotalUsedCpusReceived

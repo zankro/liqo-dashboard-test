@@ -103,12 +103,30 @@ function LocalClusterTreemapChart({
               localCluster.name,
               ...remoteClusters.flatMap(cluster => [
                 cluster.name,
-                cluster.name + (metric === 'Ram' ? ' GB Remaining' : metric === 'CPU' ? ' CPUs Remaining' : 0),
-                cluster.name + (metric === 'Ram' ? ' GB Used' : metric === 'CPU' ? ' CPUs Used' : 0),
+                cluster.name +
+                  (metric === 'Ram'
+                    ? ' GB Remaining'
+                    : metric === 'CPU'
+                    ? ' CPUs Remaining'
+                    : 0),
+                cluster.name +
+                  (metric === 'Ram'
+                    ? ' GB Used'
+                    : metric === 'CPU'
+                    ? ' CPUs Used'
+                    : 0),
               ]),
               'Local Resources',
-              (metric === 'Ram' ? ' GB Remaining' : metric === 'CPU' ? 'CPUs Remaining' : 0),
-              (metric === 'Ram' ? ' GB Used' : metric === 'CPU' ? 'CPUs Used' : 0),
+              metric === 'Ram'
+                ? ' GB Remaining'
+                : metric === 'CPU'
+                ? 'CPUs Remaining'
+                : 0,
+              metric === 'Ram'
+                ? ' GB Used'
+                : metric === 'CPU'
+                ? 'CPUs Used'
+                : 0,
             ],
             parents: [
               '',
