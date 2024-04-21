@@ -37,9 +37,9 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
     ) {
       value +=
         metric === 'Ram'
-          ? bytesToGB(cluster.TotalMemoryRecived)
+          ? bytesToGB(cluster.TotalMemoryReceived)
           : metric === 'CPU'
-          ? cluster.TotalCpusRecived
+          ? cluster.TotalCpusReceived
           : 0;
     }
     return value;
@@ -73,9 +73,9 @@ const ClusterBubbleChart: React.FC<ClusterBubbleChartProps> = ({
     hoverText.push(
       <p key="outgoing">
         {metric === 'Ram'
-          ? `TotalMemoryRecived: ${bytesToGB(cluster.TotalMemoryRecived)} GB`
+          ? `TotalMemoryReceived: ${bytesToGB(cluster.TotalMemoryReceived)} GB`
           : metric === 'CPU'
-          ? `TotalCpusOffered: ${cluster.TotalCpusRecived} MilliCores`
+          ? `TotalCpusOffered: ${cluster.TotalCpusReceived} MilliCores`
           : 'No value Found'}
       </p>
     );

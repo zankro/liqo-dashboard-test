@@ -9,29 +9,29 @@ import (
 
 // ClusterDto represents the data of a cluster which is returned to the client.
 type ClusterDto struct {
-	clusterID              string
-	Name                   string                                       `json:"name"`
-	Networking             discoveryv1alpha1.PeeringConditionStatusType `json:"networking"`
-	Authentication         discoveryv1alpha1.PeeringConditionStatusType `json:"authentication"`
-	OutgoingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"outgoingPeering"`
-	OutgoingResources      *[]NodeResourceMetrics                       `json:"outgoingResources"`
-	IncomingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"incomingPeering"`
-	IncomingResources      *[]PodResourceMetrics                        `json:"incomingResources"`
-	Age                    string                                       `json:"age,omitempty"`
-	TotalUsedCpusOffered   float64                                      `json:"TotalUsedCpusOffered"`
-	TotalUsedMemoryOffered float64                                      `json:"TotalUsedMemoryOffered"`
-	TotalCpusOffered       float64                                      `json:"TotalCpusOffered"`
-	TotalMemoryOffered     float64                                      `json:"TotalMemoryOffered"`
-	TotalUsedMemoryRecived float64                                      `json:"TotalUsedMemoryRecived"`
-	TotalUsedCpusRecived   float64                                      `json:"TotalUsedCpusRecived"`
-	TotalMemoryRecived     float64                                      `json:"TotalMemoryRecived"`
-	TotalCpusRecived       float64                                      `json:"TotalCpusRecived"`
-	ClusterCPU             float64                                      `json:"clusterCPU"`
-	ClusterMemory          float64                                      `json:"clusterMemory"`
-	ClusterCpuUsage        float64                                      `json:"clusterCpuUsage"`
-	ClusterMemoryUsage     float64                                      `json:"clusterMemoryUsage"`
-	Latency                net.ConnectionLatency                        `json:"Latency"`
-	LocalResources         *[]NodeResourceMetrics                       `json:"localResources"`
+	clusterID               string
+	Name                    string                                       `json:"name"`
+	Networking              discoveryv1alpha1.PeeringConditionStatusType `json:"networking"`
+	Authentication          discoveryv1alpha1.PeeringConditionStatusType `json:"authentication"`
+	OutgoingPeering         discoveryv1alpha1.PeeringConditionStatusType `json:"outgoingPeering"`
+	OutgoingResources       *[]NodeResourceMetrics                       `json:"outgoingResources"`
+	IncomingPeering         discoveryv1alpha1.PeeringConditionStatusType `json:"incomingPeering"`
+	IncomingResources       *[]PodResourceMetrics                        `json:"incomingResources"`
+	Age                     string                                       `json:"age,omitempty"`
+	TotalUsedCpusOffered    float64                                      `json:"TotalUsedCpusOffered"`
+	TotalUsedMemoryOffered  float64                                      `json:"TotalUsedMemoryOffered"`
+	TotalCpusOffered        float64                                      `json:"TotalCpusOffered"`
+	TotalMemoryOffered      float64                                      `json:"TotalMemoryOffered"`
+	TotalUsedMemoryReceived float64                                      `json:"TotalUsedMemoryReceived"`
+	TotalUsedCpusReceived   float64                                      `json:"TotalUsedCpusReceived"`
+	TotalMemoryReceived     float64                                      `json:"TotalMemoryReceived"`
+	TotalCpusReceived       float64                                      `json:"TotalCpusReceived"`
+	ClusterCPU              float64                                      `json:"clusterCPU"`
+	ClusterMemory           float64                                      `json:"clusterMemory"`
+	ClusterCpuUsage         float64                                      `json:"clusterCpuUsage"`
+	ClusterMemoryUsage      float64                                      `json:"clusterMemoryUsage"`
+	Latency                 net.ConnectionLatency                        `json:"Latency"`
+	LocalResources          *[]NodeResourceMetrics                       `json:"localResources"`
 }
 
 type LocalClusterResourcesMetrics struct {

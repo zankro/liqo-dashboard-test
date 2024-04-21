@@ -93,31 +93,6 @@ function LocalClusterTreemapChart({
     return hsl.toString();
   };
 
-  const modifiedColors = modifyDuplicateColors(colors, 30);
-  console.log(localCluster);
-
-  const values = [
-    remoteClusters.reduce(
-      (accumulator, cluster) =>
-        accumulator +
-        (metric === 'Ram'
-          ? bytesToGB(cluster.TotalMemoryRecived)
-          : metric === 'CPU'
-          ? cluster.TotalCpusRecived
-          : 0),
-      metric === 'Ram'
-        ? bytesToGB(localCluster.clusterMemory)
-        : metric === 'CPU'
-        ? localCluster.clusterCPU
-        : 0
-    ),
-    metric === 'Ram'
-      ? bytesToGB(localCluster.clusterMemory)
-      : metric === 'CPU'
-      ? localCluster.clusterCPU
-      : 0,
-  ];
-
   return (
     <>
       <Plot
@@ -128,12 +103,30 @@ function LocalClusterTreemapChart({
               localCluster.name,
               ...remoteClusters.flatMap(cluster => [
                 cluster.name,
-                cluster.name + ' Remaining',
-                cluster.name + ' Used',
+                cluster.name +
+                  (metric === 'Ram'
+                    ? ' GB Remaining'
+                    : metric === 'CPU'
+                    ? ' CPUs Remaining'
+                    : 0),
+                cluster.name +
+                  (metric === 'Ram'
+                    ? ' GB Used'
+                    : metric === 'CPU'
+                    ? ' CPUs Used'
+                    : 0),
               ]),
               'Local Resources',
-              'Remaining',
-              'Used',
+              metric === 'Ram'
+                ? ' GB Remaining'
+                : metric === 'CPU'
+                ? 'CPUs Remaining'
+                : 0,
+              metric === 'Ram'
+                ? ' GB Used'
+                : metric === 'CPU'
+                ? 'CPUs Used'
+                : 0,
             ],
             parents: [
               '',
@@ -154,9 +147,9 @@ function LocalClusterTreemapChart({
                 (accumulator, cluster) =>
                   accumulator +
                   (metric === 'Ram'
-                    ? bytesToGB(cluster.TotalMemoryRecived)
+                    ? bytesToGB(cluster.TotalMemoryReceived)
                     : metric === 'CPU'
-                    ? cluster.TotalCpusRecived
+                    ? cluster.TotalCpusReceived
                     : 0),
                 metric === 'Ram'
                   ? bytesToGB(localCluster.clusterMemory)
@@ -166,22 +159,22 @@ function LocalClusterTreemapChart({
               ),
               ...remoteClusters.flatMap(cluster => [
                 metric === 'Ram'
-                  ? bytesToGB(cluster.TotalMemoryRecived)
+                  ? bytesToGB(cluster.TotalMemoryReceived)
                   : metric === 'CPU'
-                  ? cluster.TotalCpusRecived
+                  ? cluster.TotalCpusReceived
                   : 0,
                 metric === 'Ram'
                   ? bytesToGB(
-                      cluster.TotalMemoryRecived -
-                        cluster.TotalUsedMemoryRecived
+                      cluster.TotalMemoryReceived -
+                        cluster.TotalUsedMemoryReceived
                     )
                   : metric === 'CPU'
-                  ? cluster.TotalCpusRecived - cluster.TotalUsedCpusRecived
+                  ? cluster.TotalCpusReceived - cluster.TotalUsedCpusReceived
                   : 0,
                 metric === 'Ram'
-                  ? bytesToGB(cluster.TotalUsedMemoryRecived)
+                  ? bytesToGB(cluster.TotalUsedMemoryReceived)
                   : metric === 'CPU'
-                  ? cluster.TotalUsedCpusRecived
+                  ? cluster.TotalUsedCpusReceived
                   : 0,
               ]),
               metric === 'Ram'

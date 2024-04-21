@@ -1,3 +1,7 @@
 .card {
   min-width: auto;
 }
+
+.centered-card-title {
+  text-align: center;
+}

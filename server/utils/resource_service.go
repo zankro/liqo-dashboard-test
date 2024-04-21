@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	//net "github.com/liqotech/liqo/apis/net/v1alpha1"
 	net "github.com/liqotech/liqo/apis/net/v1alpha1"
 
 	discoveryv1alpha1 "github.com/liqotech/liqo/apis/discovery/v1alpha1"
@@ -83,7 +82,6 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	//map[clusterID]nodeName
 	remoteNodeList := make(map[string]string)
 	localNodeList := []string{}
-	//Questa è da ottimizzare perchè non è efficiente dato che devo fare una ricerca per valore nella mappa [podName]nodeName
 	nodeList := &corev1.NodeList{}
 	err = cl.List(ctx, nodeList)
 	if err != nil {
@@ -106,7 +104,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	fmt.Println("Local Nodes: ", localNodeList)
 	fmt.Println("Remote Nodes: ", remoteNodeList)
 
-	// si chiama localPodList ma in realta' prende tutti i pods, anche quelli offloaded. Mappa podName -> nodeName
+	// retrieve pods from local cluster
 	localPodList := &corev1.PodList{}
 	err = cl.List(ctx, localPodList)
 	if err != nil {
@@ -114,8 +112,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		return nil, err
 	}
 
-	// Qua creo effettivamente la mappa podName --> nodeName
-	//map[podName]nodeName
+	// maps podName to nodeName of the node where the pod is running
+	// map[podName]nodeName
 	localNodeNamePod := make(map[string]string)
 	for _, pod := range localPodList.Items {
 		localNodeNamePod[pod.Name] = pod.Spec.NodeName
@@ -143,8 +141,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 
 	incomingPodMetricsList := []metricsv1beta1.PodMetricsList{}
 
-	// Per ogni foreign cluster recupero le metriche dei pods con label virtualkubelet.liqo.io/origin=clusterID e le aggiungo alla lista incomingPodMetricsList
-	// clusterID è l'ID del foreign cluster
+	// For each foreign cluster, retrieve the metrics of the pods with label virtualkubelet.liqo.io/origin=clusterID and add them to the incomingPodMetricsList list
+	// clusterID is the ID of the foreign cluster
 	for _, actualCluster := range ClusterDtoArray {
 		podMetricsList := &metricsv1beta1.PodMetricsList{}
 		clusterID := actualCluster.clusterID
@@ -158,7 +156,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 
 	incomingAggregates(&ClusterDtoArray, &incomingPodMetricsList, &incomingPodResources, &incomingClusterResources)
 
-	// Recupero la latency per ogni foreign cluster e la aggiungo al ClusterDto
+	// Retrieve the latency for each foreign cluster and add it to the ClusterDto
 	latency := &net.TunnelEndpointList{}
 
 	if err := cl.List(ctx, latency); err != nil {
@@ -173,7 +171,7 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 		}
 	}
 
-	// Per ogni foreign cluster calcolo le risorse totali ricevute e offerte
+	// For each foreign cluster calculate the total resources received and offered
 	for i := range ClusterDtoArray {
 		if isPeeringEstablished(ClusterDtoArray[i].OutgoingPeering) {
 			clusterNode := &corev1.NodeList{}
@@ -185,8 +183,8 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 			if len(clusterNode.Items) != 1 {
 				return nil, fmt.Errorf("expected exactly one element in the list of Nodes but got %d", len(clusterNode.Items))
 			}
-			ClusterDtoArray[i].TotalCpusRecived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
-			ClusterDtoArray[i].TotalMemoryRecived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
+			ClusterDtoArray[i].TotalCpusReceived = clusterNode.Items[0].Status.Capacity.Cpu().AsApproximateFloat64()
+			ClusterDtoArray[i].TotalMemoryReceived = clusterNode.Items[0].Status.Capacity.Memory().AsApproximateFloat64()
 		}
 		if isPeeringEstablished(ClusterDtoArray[i].IncomingPeering) {
 			resourceOffer, err := liqogetters.GetResourceOfferByLabel(ctx, cl, metav1.NamespaceAll, liqolabels.LocalLabelSelectorForCluster(ClusterDtoArray[i].clusterID))
@@ -212,10 +210,10 @@ func getDetailedResources(ctx context.Context, cl client.Client) (map[string][]C
 	for _, clusterDto := range ClusterDtoArray {
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
 			localCluster.OutgoingPeering = discoveryv1alpha1.PeeringConditionStatusEstablished
-			localCluster.TotalUsedCpusRecived += clusterDto.TotalUsedCpusRecived
-			localCluster.TotalUsedMemoryRecived += clusterDto.TotalUsedMemoryRecived
-			localCluster.TotalCpusRecived += clusterDto.TotalCpusRecived
-			localCluster.TotalMemoryRecived += clusterDto.TotalMemoryRecived
+			localCluster.TotalUsedCpusReceived += clusterDto.TotalUsedCpusReceived
+			localCluster.TotalUsedMemoryReceived += clusterDto.TotalUsedMemoryReceived
+			localCluster.TotalCpusReceived += clusterDto.TotalCpusReceived
+			localCluster.TotalMemoryReceived += clusterDto.TotalMemoryReceived
 		}
 
 		if isPeeringEstablished(clusterDto.IncomingPeering) {
@@ -249,7 +247,7 @@ func offloadingAggregates(podMetricsList *metricsv1beta1.PodMetricsList, localNo
 		var podCpuUsage, podMemoryUsage float64
 		containerResources := []ContainerResourceMetrics{}
 
-		// Aggrego risorse usate per ogni container del pod
+		// Aggregate resources used for each container of the pod
 		for _, cont := range pod.Containers {
 			cpuUsage := cont.Usage.Cpu().AsApproximateFloat64()
 			memoryUsage := cont.Usage.Memory().AsApproximateFloat64()
@@ -262,7 +260,7 @@ func offloadingAggregates(podMetricsList *metricsv1beta1.PodMetricsList, localNo
 			})
 		}
 
-		// Se il pod è offloaded, aggrego e aggiungo le risorse usate al nodo remoto
+		// If the pod is offloaded, aggregate and add the used resources to the remote node
 		if remoteNodeNamePod[pod.Name] != "" && pod.ObjectMeta.Labels["liqo.io/shadowPod"] != "" {
 			var remoteNode NodeResourceMetrics
 			if _, exists := (*virtualNodeResourceMetrics)[remoteNodeNamePod[pod.Name]]; exists {
@@ -279,7 +277,7 @@ func offloadingAggregates(podMetricsList *metricsv1beta1.PodMetricsList, localNo
 			if remoteNode.Pods == nil {
 				remoteNode.Pods = &[]PodResourceMetrics{}
 			}
-			//credo la * si possa cancellare (anche dal models)
+
 			*remoteNode.Pods = append(*remoteNode.Pods, PodResourceMetrics{
 				Name:                pod.Name,
 				ContainersResources: &containerResources,
@@ -291,7 +289,7 @@ func offloadingAggregates(podMetricsList *metricsv1beta1.PodMetricsList, localNo
 
 		} else if localNodeNamePod[pod.Name] != "" && namespaceMap[pod.Namespace] {
 
-			// Se il pod è locale, aggrego e aggiungo le risorse usate al nodo locale
+			// If the pod is local, aggregate and add the used resources to the local node
 			var localNode NodeResourceMetrics
 			if _, exists := (*localNodeResourceMetrics)[remoteNodeNamePod[pod.Name]]; exists {
 				localNode = (*localNodeResourceMetrics)[remoteNodeNamePod[pod.Name]]
@@ -323,8 +321,8 @@ func offloadingAggregates(podMetricsList *metricsv1beta1.PodMetricsList, localNo
 
 func createOffloadingDTO(ClusterDtoArray *[]ClusterDto, localNodeResourceMetrics *map[string]NodeResourceMetrics, virtualNodeResourceMetrics *map[string]NodeResourceMetrics, foreignClusterList *discoveryv1alpha1.ForeignClusterList, remoteNodeList map[string]string) {
 
-	// Per ogni foreign cluster creo un ClusterDto e controllo se è in peering Outgoing.
-	// In tal caso aggiungo le risorse outgoing calcolate precedentemente
+	// For each foreign cluster I create a ClusterDto and check if it is in Outgoing peering.
+	// In this case I add the outgoing resources calculated previously
 	for i := range foreignClusterList.Items {
 		clusterDto := fromForeignCluster(&foreignClusterList.Items[i])
 		if isPeeringEstablished(clusterDto.OutgoingPeering) {
@@ -334,8 +332,8 @@ func createOffloadingDTO(ClusterDtoArray *[]ClusterDto, localNodeResourceMetrics
 			*clusterDto.OutgoingResources = append(*clusterDto.OutgoingResources, outgoingResources)
 			fmt.Println("Outgoing resources: ", clusterDto.OutgoingResources)
 			clusterDto.IncomingResources = nil
-			clusterDto.TotalUsedCpusRecived = outgoingResources.TotalCpus
-			clusterDto.TotalUsedMemoryRecived = outgoingResources.TotalMemory
+			clusterDto.TotalUsedCpusReceived = outgoingResources.TotalCpus
+			clusterDto.TotalUsedMemoryReceived = outgoingResources.TotalMemory
 			clusterDto.LocalResources = nil
 		}
 		*ClusterDtoArray = append(*ClusterDtoArray, *clusterDto)
@@ -346,7 +344,7 @@ func createOffloadingDTO(ClusterDtoArray *[]ClusterDto, localNodeResourceMetrics
 
 func incomingAggregates(ptrArray *[]ClusterDto, incomingPodMetricsList *[]metricsv1beta1.PodMetricsList, incomingPodResources *map[string]PodResourceMetrics, incomingClusterResources *map[string][]PodResourceMetrics) {
 
-	// Per ogni pod della lista incomingPodMetricsList calcolo le risorse usate e le aggiungo alla lista incomingPodResources
+	// For each pod in the incomingPodMetricsList list, calculate the used resources and add them to the incomingPodResources list
 	for _, pod := range *incomingPodMetricsList {
 		for _, podMetrics := range pod.Items {
 
@@ -364,7 +362,7 @@ func incomingAggregates(ptrArray *[]ClusterDto, incomingPodMetricsList *[]metric
 				})
 			}
 
-			// Aggrego le risorse usate per ogni pod con stesso clusterID di origine
+			// Aggregate resources used for each pod with the same clusterID of origin
 			var incomingPod PodResourceMetrics
 			if _, exists := (*incomingPodResources)[incomingPod.Name]; exists {
 				incomingPod = (*incomingPodResources)[podMetrics.Name]
@@ -414,8 +412,6 @@ func localResourcesAggregates(ctx context.Context, cl client.Client, clusterdata
 	clusterUsedCPU := 0.0
 	clusterUsedMemory := 0.0
 
-	//localClusterResources := &LocalClusterResourcesMetrics{}
-	//localNodes := &metricsv1beta1.NodeMetricsList{}
 	localNodes := &corev1.NodeList{}
 
 	err := cl.List(ctx, localNodes)
@@ -447,9 +443,5 @@ func localResourcesAggregates(ctx context.Context, cl client.Client, clusterdata
 	clusterdata.ClusterMemory = clusterMemory
 	clusterdata.ClusterCpuUsage = clusterUsedCPU
 	clusterdata.ClusterMemoryUsage = clusterUsedMemory
-
-	/*for i := range *localNodeResourceMetrics {
-		localNodeResources = append(localNodeResources, (*localNodeResourceMetrics)[i])
-	}*/
 
 }

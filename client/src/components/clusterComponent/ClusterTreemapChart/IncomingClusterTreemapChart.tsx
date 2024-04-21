@@ -81,8 +81,18 @@ const IncomingClusterTreemapChart: React.FC<
             'Local Resources',
             ...remoteClusters.flatMap(cluster => [
               cluster.name,
-              `${cluster.name} Remaining`,
-              `${cluster.name} Used`,
+              `${cluster.name} ` +
+                (metric === 'Ram'
+                  ? ' GB Offered'
+                  : metric === 'CPU'
+                  ? ' CPUs Offered'
+                  : 0),
+              `${cluster.name}` +
+                (metric === 'Ram'
+                  ? ' GB Offered'
+                  : metric === 'CPU'
+                  ? ' CPUs Offered'
+                  : 0),
             ]),
           ],
           parents: [

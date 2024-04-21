@@ -9,10 +9,10 @@ export type ForeignCluster = {
   incomingResources: PodResourceMetrics[];
   TotalUsedCpusOffered: number;
   TotalUsedMemoryOffered: number;
-  TotalUsedMemoryRecived: number;
-  TotalUsedCpusRecived: number;
-  TotalMemoryRecived: number;
-  TotalCpusRecived: number;
+  TotalUsedMemoryReceived: number;
+  TotalUsedCpusReceived: number;
+  TotalMemoryReceived: number;
+  TotalCpusReceived: number;
   TotalMemoryOffered: number;
   TotalCpusOffered: number;
   Latency: ConnectionLatency;
@@ -52,25 +52,6 @@ export type LocalResources = {
   nodeTotalCpus: number;
   nodeTotalMemory: number;
 };
-/*
-	clusterID              string
-	Name                   string                                       `json:"name"`
-	Networking             discoveryv1alpha1.PeeringConditionStatusType `json:"networking"`
-	Authentication         discoveryv1alpha1.PeeringConditionStatusType `json:"authentication"`
-	OutgoingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"outgoingPeering"`
-	OutgoingResources      *NodeResourceMetrics                         `json:"outgoingResources"`
-	IncomingPeering        discoveryv1alpha1.PeeringConditionStatusType `json:"incomingPeering"`
-	IncomingResources      *[]PodResourceMetrics                        `json:"incomingResources"`
-	Age                    string                                       `json:"age,omitempty"`
-	TotalUsedCpusOffered   float64                                      `json:"TotalUsedCpusOffered"`
-	TotalUsedMemoryOffered float64                                      `json:"TotalUsedMemoryOffered"`
-	TotalUsedMemoryRecived float64                                      `json:"TotalUsedMemoryRecived"`
-	TotalUsedCpusRecived   float64                                      `json:"TotalUsedCpusRecived"`
-	TotalMemoryRecived     float64                                      `json:"TotalMemoryRecived"`
-	TotalCpusRecived       float64                                      `json:"TotalCpusRecived"`
-	Latency                net.ConnectionLatency                        `json:"Latency"`
-	LocalResources         *[]NodeResourceMetrics                       `json:"localResources"`
-*/
 
 export type ResourcesMetrics = {
   totalCpus: number;

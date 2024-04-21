@@ -19,7 +19,7 @@ func SetupRouterAndServeHTTP(ctx context.Context, cl client.Client) error {
 	addr := os.Getenv("SERVER_ADDR")
 	fmt.Println("addr: ", addr)
 	if addr == "" {
-		klog.Fatal("environment variable named SERVER_ADDR not set")
+		klog.Fatal("Environment variable named SERVER_ADDR not set")
 	}
 
 	router := routes(ctx, cl)
@@ -50,13 +50,13 @@ func foreignClusters(ctx context.Context, cl client.Client) http.HandlerFunc {
 				Status:  http.StatusInternalServerError,
 			})
 			if err != nil {
-				klog.Errorf("error encoding error response: %s", err)
+				klog.Errorf("Error encoding error response: %s", err)
 			}
 		}
 
 		err = json.NewEncoder(w).Encode(clusters)
 		if err != nil {
-			klog.Errorf("error encoding foreign clusters response: %s", err)
+			klog.Errorf("Error encoding foreign clusters response: %s", err)
 		}
 	}
 }
