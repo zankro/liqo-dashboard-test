@@ -22,9 +22,9 @@ spec:
         image: {{ .Values.frontend.imageName }}:{{ .Values.image.tag }}
         ports:
           - name: frontend-port
-            containerPort: 80
+            containerPort: 8080
         env:
         - name: REACT_APP_BACKEND_ADDRESS
-          value: "liqo-dashboard-backend-service.default.svc.cluster.local"
+          value: "{{ .Values.backend.host }}"
         - name: REACT_APP_BACKEND_PORT
           value: "{{ .Values.backend.port }}"

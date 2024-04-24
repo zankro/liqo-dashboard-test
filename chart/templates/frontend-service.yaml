@@ -11,6 +11,6 @@ spec:
   type: {{ .Values.frontend.service.type }}
   ports:
     - port: {{ .Values.frontend.port }}
-      targetPort: 80
+      targetPort: 8080
   selector:
     {{- include "chart.selectorLabels" $frontendDeployment | nindent 4}}

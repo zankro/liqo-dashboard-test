@@ -24,7 +24,7 @@ spec:
         image: {{ .Values.backend.imageName }}:{{ .Values.image.tag }}
         ports:
           - name: backend-port
-            containerPort: 8080
+            containerPort: {{ .Values.backend.port }}
         env:
         - name: SERVER_ADDR
           value: :{{ .Values.backend.port }}

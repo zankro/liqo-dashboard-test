@@ -8,7 +8,7 @@ metadata:
     {{- include "chart.labels" $clusterRole | nindent 4}}
 rules:
 - apiGroups: [""]
-  resources: ["nodes", "pods"]
+  resources: ["nodes", "pods", "configmaps"]
   verbs: ["get", "watch", "list"]
 - apiGroups: ["discovery.liqo.io"]
   resources: ["foreignclusters"]
@@ -18,4 +18,7 @@ rules:
   verbs: ["get", "watch", "list"]
 - apiGroups: ["metrics.k8s.io"]
   resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["net.liqo.io"]
+  resources: ["tunnelendpoints"]
   verbs: ["get", "watch", "list"]
