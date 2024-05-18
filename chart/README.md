@@ -6,13 +6,13 @@
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| backend.imageName | string | `"lucarocco97/liqo-dashboard-backend"` | Backend dashboard image name   |
+| backend.imageName | string | `"maldimeriggio/liqodash-backend"` | Backend dashboard image name   |
 | backend.ingress.annotations | object | `{}` | Backend ingress' annotations |
 | backend.port | int | `8080` | Server's port |
 | backend.replicas | int | `1` | Number of replicas of backend's pods |
 | backend.service.type | string | `"ClusterIP"` | Type of service. A ClusterIP service is enough because we are using an ingress |
 | frontend.gaTrackingID | string | `""` | Google Analytics traking ID. It enables simple GA metrics such as number of visits |
-| frontend.imageName | string | `"lucarocco97/liqo-dashboard-frontend"` | Frontend dashboard image name |
+| frontend.imageName | string | `"maldimeriggio/liqodash-backend"` | Frontend dashboard image name |
 | frontend.ingress.annotations | object | `{}` | Frontend ingress' annotations |
 | frontend.port | int | `8080` | Frontend port |
 | frontend.replicas | int | `1` | Number of replicas of frontend's pods |
