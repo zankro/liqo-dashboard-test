@@ -8,7 +8,7 @@
 |-----|------|---------|-------------|
 | backend.imageName | string | `"maldimeriggio/liqodash-backend"` | Backend dashboard image name   |
 | backend.ingress.annotations | object | `{}` | Backend ingress' annotations |
-| backend.port | int | `8080` | Server's port |
+| backend.port | int | `8089` | Server's port |
 | backend.replicas | int | `1` | Number of replicas of backend's pods |
 | backend.service.type | string | `"ClusterIP"` | Type of service. A ClusterIP service is enough because we are using an ingress |
 | frontend.gaTrackingID | string | `""` | Google Analytics traking ID. It enables simple GA metrics such as number of visits |
