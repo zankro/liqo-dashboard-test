@@ -3,8 +3,6 @@
 The *Liqo public peering dashboard* is an open-source, web-based dashboard that exposes the status of the Liqo peerings established with the current cluster (both incoming and outgoing), and the amount of resources (i.e., in terms of vCPUs and memory) used/offered in each peering by visually showing these metrics through charts designed to easily understand how much of the offered resources are in use.
 
 ![Preview](./doc/images/screenshot1.png)
-![Preview](./doc/images/screenshot2.png)
-![Preview](./doc/images/screenshot3.png)
 
 ## Prerequisites
 
@@ -41,6 +39,11 @@ helm install liqo-dashboard --set host=<<host_here>> --tls.secretName=<<certific
 Note that the secret should already exist or cert-manager shall be present (and consequently the annotation must be declared for the ingress).
 
 You can find the complete list of additional values [here](./chart/README.md).
+
+## Screenshots 
+
+![Preview](./doc/images/screenshot2.png)
+![Preview](./doc/images/screenshot3.png)
 
 ## Contributing
 
